@@ -1,8 +1,8 @@
 {
   "$schema": "https://openapi.vercel.sh/vercel.json",
   "framework": null,
-  "installCommand": "cd .. && corepack enable && corepack prepare pnpm@9.15.0 --activate && PNPM_CONFIG_ENGINE_STRICT=false pnpm install --config.engine-strict=false",
-  "buildCommand": "cd .. && PNPM_CONFIG_ENGINE_STRICT=false pnpm --filter web-nuxt-ui run build:vercel",
+  "installCommand": "cd .. && corepack enable && corepack prepare pnpm@10.28.1 --activate && PNPM_CONFIG_ENGINE_STRICT=false pnpm install --config.engine-strict=false",
+  "buildCommand": "node ./scripts/build-vercel.mjs",
   "outputDirectory": "dist",
   "rewrites": [
     { "source": "/(.*)", "destination": "/index.html" }
