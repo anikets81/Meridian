@@ -1,0 +1,145 @@
+<template>
+  <ConnectionStatusBanner />
+  <template v-if="orgStore.initialized">
+    <div class="min-h-screen premium-shell-bg">
+      <UDashboardGroup
+        unit="rem"
+        storage="local"
+        class="UDashboardGroup-test"
+      >
+        <DashboardSidebarFirst v-if="appStore.sidebarView === 'first'" />
+        <DashboardSidebarSecond v-else />
+
+        <RouterView />
+
+        <SearchAll />
+      </UDashboardGroup>
+
+      <TvMobileBottomNav />
+    </div>
+  </template>
+</template>
+
+<script setup lang="ts">
+import { onMounted, watch } from 'vue'
+import { useRoute, useRouter } from 'vue-router'
+import { useEventListener } from '@vueuse/core'
+import { App } from '@capacitor/app'
+import { CapacitorUpdater } from '@capgo/capacitor-updater'
+import { useUpdater } from '@/composables/useUpdater'
+import { useAppStore } from '@/stores/app.store'
+import { useI18n } from 'vue-i18n'
+import ConnectionStatusBanner from '@/components/ConnectionStatusBanner.vue'
+import DashboardSidebarFirst from '@/components/sidebars/DashboardSidebarFirst.vue'
+import DashboardSidebarSecond from '@/components/sidebars/DashboardSidebarSecond.vue'
+import TvMobileBottomNav from '@/components/features/base/TvMobileBottomNav.vue'
+import SearchAll from '@/components/features/main/screen-main/parts/SearchAll.vue'
+import { useCentrifugo } from '@/composables/useCentrifugo'
+import { usePushNotifications } from '@/composables/usePushNotifications'
+import { useWidgetSnapshot } from '@/composables/useWidgetSnapshot'
+import { useWidgetDeepLink } from '@/composables/useWidgetDeepLink'
+import { useGoalsStore } from '@/stores/goals.store'
+import { useOrganizationStore } from '@/stores/organization.store'
+import { useTimeTrackingStore } from '@/stores/time-tracking.store'
+import { useUiPreferencesStore } from '@/stores/uiPreferences.store'
+
+const { connect: connectCentrifugo } = useCentrifugo()
+const { init: initPush } = usePushNotifications()
+const { t } = useI18n()
+const toast = useToast()
+const appStore = useAppStore()
+const goalsStore = useGoalsStore()
+const orgStore = useOrganizationStore()
+const timeTrackingStore = useTimeTrackingStore()
+const uiPrefsStore = useUiPreferencesStore()
+
+useWidgetSnapshot()
+useWidgetDeepLink()
+
+watch(
+  () => timeTrackingStore.lastError,
+  (err) => {
+    if (!err) return
+    toast.add({ title: t(err.key), color: 'error' })
+  },
+)
+const route = useRoute()
+const router = useRouter()
+
+watch(
+  () => [goalsStore.initialized, goalsStore.goals, route.params.projectId] as const,
+  ([initialized, goals, projectId]) => {
+    if (!initialized || !projectId) return
+    const exists = goals.some((g) => g.id === Number(projectId))
+    if (!exists) {
+      router.replace({ name: 'user' })
+    }
+  },
+)
+
+let updateInProgress = false
+
+App.addListener('appStateChange', async ({ isActive }) => {
+  console.log('appStateChange user layout', isActive)
+
+  if (!isActive) {
+    await useUpdater(true)
+  }
+
+  if (isActive && !updateInProgress) {
+    try {
+      updateInProgress = true
+      await useUpdater()
+    } catch (error) {
+      console.error('[Update] Error in appStateChange update:', error)
+    } finally {
+      updateInProgress = false
+    }
+
+    initPush()
+  }
+})
+
+onMounted(async () => {
+  console.log('-------------------------------- onMounted push notifications --------------------------------')
+  appStore.initTaskDetailDisplayMode()
+  appStore.initSidebarView()
+  connectCentrifugo()
+  initPush()
+
+  if (!orgStore.organizations.length) {
+    await orgStore.fetchOrganizations()
+  }
+
+  const slugFromUrl = route.params.orgSlug as string
+  const matchedOrg = orgStore.findOrgBySlug(slugFromUrl)
+  if (matchedOrg) {
+    orgStore.setCurrentOrg(matchedOrg)
+    orgStore.initialized = true
+  } else {
+    orgStore.restoreCurrentOrg()
+    if (orgStore.currentOrg) {
+      router.replace({ name: 'user', params: { orgSlug: orgStore.currentOrgSlug } })
+      return
+    }
+  }
+
+  await goalsStore.fetchGoals()
+  timeTrackingStore.fetchActive()
+  if (!uiPrefsStore.loaded) uiPrefsStore.fetch()
+
+  useEventListener(document, 'visibilitychange', () => {
+    if (!document.hidden) timeTrackingStore.fetchActive()
+  })
+
+  await CapacitorUpdater.notifyAppReady()
+  console.log('notifyAppReady', APP_VERSION)
+
+  try {
+    console.log('[Update] Starting initial update check')
+    await useUpdater()
+  } catch (error) {
+    console.error('[Update] Error in initial update check:', error)
+  }
+})
+</script>

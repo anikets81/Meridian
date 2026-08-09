@@ -1,0 +1,15 @@
+# Speed up Render API Docker builds
+.git
+.cursor
+**/node_modules
+**/.nuxt
+**/dist
+web/dist
+api/dist
+api/dist-migration
+deploy/visitor-demo/seed/node_modules
+**/*.md
+**/test
+**/tests
+**/.env
+**/.env.*

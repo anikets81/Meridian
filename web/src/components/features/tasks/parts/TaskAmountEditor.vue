@@ -1,0 +1,169 @@
+<template>
+  <div class="w-full h-fit">
+    <!-- <label class="text-sm text-muted mb-2 block">{{ t('tasks.amount') }}</label> -->
+
+    <div class="flex gap-2">
+      <div class="flex flex-col lg:flex-row gap-2 flex-1">
+        <!-- Amount Input -->
+        <UInput
+          :disabled="!canDeleteTask"
+          :model-value="localAmount"
+          type="text"
+          inputmode="decimal"
+          size="xl"
+          :placeholder="t('tasks.enterAmount')"
+          class="flex-1"
+          :ui="{base: 'rounded-14! h-13'}"
+          :variant="isDark ? 'subtle' : 'soft'"
+          @update:model-value="handleAmountInput"
+          @focus="editing = true"
+          @blur="handleBlur"
+        >
+          <template #leading>
+            <UIcon
+              name="i-lucide-coins"
+              class="size-4 text-muted"
+            />
+          </template>
+        </UInput>
+
+        <!-- Transaction Type Tabs -->
+        <UTabs
+          :key="tabResetKey"
+          :model-value="selectedTabValue"
+          :items="tabItems"
+          :content="false"
+          variant="pill"
+          size="xl"
+          color="success"
+          :class="{'pointer-events-none': !canDeleteTask}"
+          class="shrink-0 shadow-sm rounded-lg border border-accented"
+          :ui="{root: 'border-none rounded-14! shadow-none!', list:'rounded-14! grow', indicator: 'rounded-10!'}"
+          @update:model-value="handleTabChange"
+        />
+      </div>
+      
+
+      <!-- Clear Button -->
+      <UButton
+        v-if="hasValue"
+        :disabled="!canDeleteTask"
+        icon="i-lucide-x"
+        color="info"
+        variant="soft"
+        class="items-center justify-center"
+        size="xl"
+        :ui="{base: 'rounded-14! size-13'}"
+        @click="clearAmount"
+      />
+    </div>
+  </div>
+</template>
+
+<script setup lang="ts">
+import { ref, computed, watch } from 'vue'
+import { useI18n } from 'vue-i18n'
+import { useDebounceFn } from '@vueuse/core'
+import { useTasksStore } from '@/stores/tasks.store'
+import { useColor } from '@/composables/useColotMode'
+import { useGoalPermissions } from '@/composables/useGoalPermissions'
+
+const props = defineProps<{
+  taskId: number
+  amount: number | string | null
+  transactionType: 1 | 0 | null
+}>()
+
+const { t } = useI18n()
+const tasksStore = useTasksStore()
+const { isDark } = useColor()
+const { canDeleteTask } = useGoalPermissions()
+
+const localAmount = ref<string>(formatDisplay(props.amount))
+const tabResetKey = ref(0)
+// don't overwrite what user is typing with server response like "2.00"
+const editing = ref(false)
+
+function formatDisplay(value: number | string | null): string {
+  if (value === null || value === '') return ''
+  const num = parseFloat(value.toString())
+  if (isNaN(num)) return ''
+  // drop trailing zeros: 2.00 -> 2, 2.50 -> 2.5
+  return String(num)
+}
+
+// only sync from server when user is not editing
+watch(() => props.amount, (newAmount) => {
+  if (editing.value) return
+  localAmount.value = formatDisplay(newAmount)
+})
+
+const tabItems = computed(() => [
+  {
+    label: t('tasks.income'),
+    icon: 'i-lucide-trending-up',
+    value: 'income',
+  },
+  {
+    label: t('tasks.expense'),
+    icon: 'i-lucide-trending-down',
+    value: 'expense',
+  },
+])
+
+const selectedTabValue = computed(() => {
+  if (props.transactionType === 1) return 'income'
+  if (props.transactionType === 0) return 'expense'
+  return undefined
+})
+
+async function handleTabChange(value: string | number) {
+  const newType = value === 'income' ? 1 : 0
+  if (newType === props.transactionType) return
+
+  await tasksStore.updateTaskTransactionType({
+    id: props.taskId,
+    transactionType: newType as 1 | 0,
+  })
+}
+
+const hasValue = computed(() =>
+  localAmount.value !== '' || props.transactionType !== null,
+)
+
+const debouncedUpdateAmount = useDebounceFn(async (amount: string | null) => {
+  await tasksStore.updateTaskAmount({
+    id: props.taskId,
+    amount,
+  })
+}, 200)
+
+function handleAmountInput(value: string | number) {
+  const raw = value.toString().replace(',', '.')
+  const sanitized = raw.replace(/[^0-9.]/g, '').replace(/(\..*)\./g, '$1')
+  localAmount.value = sanitized
+
+  const amount = sanitized === '' ? null : sanitized
+  debouncedUpdateAmount(amount)
+}
+
+function handleBlur() {
+  editing.value = false
+  // clean up display: "2." -> "2", "02" -> "2"
+  localAmount.value = formatDisplay(localAmount.value || null)
+}
+
+async function clearAmount() {
+  localAmount.value = ''
+  await tasksStore.updateTaskAmount({
+    id: props.taskId,
+    amount: null,
+  })
+  await tasksStore.updateTaskTransactionType({
+    id: props.taskId,
+    transactionType: null,
+  })
+  tabResetKey.value++
+}
+</script>
+

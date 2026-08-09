@@ -1,0 +1,329 @@
+import { and, eq, ne } from 'drizzle-orm';
+import {
+    CollaborationUsersSchema,
+    CollaborationUsersToGoalsSchema,
+    GoalsSchema,
+    type GoalsSchemaTypeForSelect,
+} from 'taskview-db-schemas';
+import type { AppUser } from '../../core/AppUser';
+import { Database } from '../../modules/db';
+import { $logger } from '../../modules/logget';
+import type { AddGoalToDbArg, GoalItemInDb, GoalItemsInDb, UpdateGoalDbArg } from '../../types/goal.type';
+import { logError } from '../../utils/api';
+import { updateQuery } from '../../utils/db-helper';
+import { callWithCatch } from '../../utils/helpers';
+import type { GoalsArgAdd, GoalsArgCreateInbox, GoalsArgDelete, GoalsArgUpdate } from './types';
+
+export class GoalsRepository {
+    private readonly db: Database;
+
+    constructor() {
+        this.db = Database.getInstance();
+    }
+
+    async fetchGoalsForUser(user: AppUser): Promise<GoalItemsInDb> {
+        const userData = user.getUserData();
+
+        if (!userData) {
+            return [];
+        }
+
+        const goals = await this.db
+            .query<GoalItemInDb>('select * from tasks.goals where owner = $1 order by id desc', [userData.id])
+            .catch(logError);
+
+        if (!goals) {
+            return [];
+        }
+
+        return goals.rows;
+    }
+
+    async addGoal(goalData: AddGoalToDbArg): Promise<GoalItemInDb | false> {
+        const query = goalData.description
+            ? 'INSERT INTO tasks.goals (name,  owner, description) VALUES ($1,$2,$3) RETURNING id;'
+            : 'INSERT INTO tasks.goals (name,  owner) VALUES ($1,$2) RETURNING id;';
+
+        const args = goalData.description
+            ? [goalData.name, goalData.userId, goalData.description]
+            : [goalData.name, goalData.userId];
+
+        const result = await this.db.query(query, args).catch(logError);
+
+        if (!result) {
+            return false;
+        }
+
+        if (result.rowCount === 0) {
+            return false;
+        }
+        return await this.fetchGoalById(result.rows[0].id);
+    }
+
+    async fetchGoalById(goalId: number): Promise<GoalItemInDb | false> {
+        const goal = await this.db
+            .query<GoalItemInDb>('select * from tasks.goals where id = $1', [goalId])
+            .catch(logError);
+
+        if (!goal) {
+            return false;
+        }
+
+        if (goal.rows.length === 0) {
+            return false;
+        }
+        return goal.rows[0];
+    }
+
+    async updateGoal(data: UpdateGoalDbArg): Promise<boolean> {
+        const queryData = updateQuery({
+            table: 'tasks.goals',
+            data: {
+                name: data.name,
+                description: data.description,
+            },
+            where: {
+                id: data.id,
+            },
+        });
+        const result = await this.db.query(queryData.query, queryData.args).catch(logError);
+
+        if (!result) {
+            return false;
+        }
+
+        return !!(result.rowCount && result.rowCount > 0);
+    }
+
+    async deleteGoal(goalId: number): Promise<boolean> {
+        const del = await this.db.query('delete from tasks.goals where id = $1', [goalId]).catch(logError);
+
+        if (!del) {
+            return false;
+        }
+
+        return !!(del.rowCount && del.rowCount > 0);
+    }
+
+    async fetchSharedGoals(user: AppUser, organizationId?: number): Promise<GoalItemInDb[]> {
+        if (!user.getUserData()?.email) {
+            $logger.error('Trying fetch shared goals without active user');
+            return [];
+        }
+
+        const params: any[] = [user.getUserData()?.email, user.getUserData()?.id];
+        let sql = `select tg.* from tasks.goals tg
+            left join collaboration.users_to_goals utg on utg.goal_id = tg.id
+            left join collaboration.users cu on cu.id = utg.user_id
+                    where cu.email = $1 and tg.owner <> $2`;
+
+        if (organizationId) {
+            sql += ' and tg.organization_id = $3';
+            params.push(organizationId);
+        }
+
+        const result = await this.db
+            .query<GoalItemInDb>(sql, params)
+            .catch(logError);
+
+        if (!result) {
+            return [];
+        }
+
+        return result.rows;
+    }
+
+    async fetchSharedGoalsForUser(user: AppUser, organizationId?: number): Promise<GoalsSchemaTypeForSelect[]> {
+        const result = await callWithCatch(() => {
+            const conditions = [
+                eq(CollaborationUsersSchema.email, user.getUserData()?.email!),
+                ne(GoalsSchema.owner, user.getUserData()?.id!),
+            ];
+            if (organizationId) {
+                conditions.push(eq(GoalsSchema.organizationId, organizationId));
+            }
+
+            const query = this.db.dbDrizzle
+                .select({
+                    id: GoalsSchema.id,
+                    name: GoalsSchema.name,
+                    description: GoalsSchema.description,
+                    color: GoalsSchema.color,
+                    dateCreation: GoalsSchema.dateCreation,
+                    owner: GoalsSchema.owner,
+                    creatorId: GoalsSchema.creatorId,
+                    editDate: GoalsSchema.editDate,
+                    archive: GoalsSchema.archive,
+                    backlogVersion: GoalsSchema.backlogVersion,
+                    organizationId: GoalsSchema.organizationId,
+                    estimateUnit: GoalsSchema.estimateUnit,
+                    isInbox: GoalsSchema.isInbox,
+                })
+                .from(GoalsSchema)
+                .leftJoin(CollaborationUsersToGoalsSchema, eq(GoalsSchema.id, CollaborationUsersToGoalsSchema.goalId))
+                .leftJoin(
+                    CollaborationUsersSchema,
+                    eq(CollaborationUsersToGoalsSchema.userId, CollaborationUsersSchema.id)
+                )
+                .where(and(...conditions));
+            // const sql = query.toSQL();
+            // console.log('query', sql);
+            return query;
+        });
+
+        return result ?? [];
+    }
+
+    async updateArchive(goalId: number, archive: GoalItemInDb['archive']): Promise<boolean> {
+        const queryData = updateQuery({
+            table: 'tasks.goals',
+            data: {
+                archive: archive,
+            },
+            where: {
+                id: goalId,
+            },
+        });
+
+        const result = await this.db.query(queryData.query, queryData.args).catch(logError);
+
+        if (!result) {
+            return false;
+        }
+
+        return !!(result.rowCount && result.rowCount > 0);
+    }
+
+    async fetchAllOwnGoalsIds(user: AppUser, organizationId?: number): Promise<number[]> {
+        const conditions = [
+            eq(GoalsSchema.owner, user.getUserData()?.id!),
+            eq(GoalsSchema.archive, 0),
+        ];
+        if (organizationId) {
+            conditions.push(eq(GoalsSchema.organizationId, organizationId));
+        }
+
+        const result = await callWithCatch(() =>
+            this.db.dbDrizzle
+                .select({ id: GoalsSchema.id })
+                .from(GoalsSchema)
+                .where(and(...conditions))
+        );
+
+        if (!result) return [];
+        return result.map((g) => g.id);
+    }
+
+    async createGoal(goalData: GoalsArgAdd, ownerId: number, creatorId?: number): Promise<GoalsSchemaTypeForSelect | false> {
+        const result = await callWithCatch(() =>
+            this.db.dbDrizzle
+                .insert(GoalsSchema)
+                .values({
+                    ...goalData,
+                    owner: ownerId,
+                    ...(creatorId && { creatorId }),
+                })
+                .returning()
+        );
+
+        if (!result) {
+            return false;
+        }
+
+        return result[0];
+    }
+
+    async findInboxGoal(organizationId: number): Promise<GoalsSchemaTypeForSelect | false> {
+        const result = await callWithCatch(() =>
+            this.db.dbDrizzle
+                .select()
+                .from(GoalsSchema)
+                .where(and(eq(GoalsSchema.organizationId, organizationId), eq(GoalsSchema.isInbox, true)))
+        );
+        if (!result || result.length === 0) return false;
+        return result[0];
+    }
+
+    async createInboxGoal(args: GoalsArgCreateInbox): Promise<GoalsSchemaTypeForSelect | false> {
+        const existing = await this.findInboxGoal(args.organizationId);
+        if (existing) {
+            return existing;
+        }
+
+        const result = await callWithCatch(() =>
+            this.db.dbDrizzle
+                .insert(GoalsSchema)
+                .values({
+                    name: 'Inbox',
+                    owner: args.ownerId,
+                    organizationId: args.organizationId,
+                    isInbox: true,
+                })
+                .returning()
+        );
+
+        if (!result) {
+            return false;
+        }
+
+        return result[0];
+    }
+
+    async updateGoalNew(goalData: GoalsArgUpdate): Promise<GoalsSchemaTypeForSelect | false> {
+        const updates: Partial<typeof GoalsSchema.$inferInsert> = {};
+        if (goalData.name !== undefined) updates.name = goalData.name;
+        if (goalData.description !== undefined) updates.description = goalData.description;
+        if (goalData.color !== undefined) updates.color = goalData.color;
+        if (goalData.estimateUnit !== undefined) updates.estimateUnit = goalData.estimateUnit;
+        if (goalData.archive !== undefined) updates.archive = goalData.archive;
+
+        if (Object.keys(updates).length === 0) {
+            return this.findGoalById(goalData.id);
+        }
+
+        const result = await callWithCatch(() =>
+            this.db.dbDrizzle.update(GoalsSchema).set(updates).where(eq(GoalsSchema.id, goalData.id)).returning()
+        );
+        if (!result) {
+            return false;
+        }
+
+        return result[0];
+    }
+
+    async deleteGoalNew(goalData: GoalsArgDelete): Promise<boolean> {
+        const result = await callWithCatch(() =>
+            this.db.dbDrizzle.delete(GoalsSchema).where(eq(GoalsSchema.id, goalData.goalId))
+        );
+
+        if (!result) {
+            return false;
+        }
+
+        return !!(result?.rowCount && result.rowCount > 0);
+    }
+
+    async findGoalById(goalId: number): Promise<GoalsSchemaTypeForSelect | false> {
+        const result = await callWithCatch(() =>
+            this.db.dbDrizzle.select().from(GoalsSchema).where(eq(GoalsSchema.id, goalId))
+        );
+        if (!result || result.length === 0) return false;
+        return result[0];
+    }
+
+    async fetchGoalsNew(userId: number, organizationId?: number): Promise<GoalsSchemaTypeForSelect[]> {
+        const conditions = [eq(GoalsSchema.owner, userId)];
+        if (organizationId) {
+            conditions.push(eq(GoalsSchema.organizationId, organizationId));
+        }
+
+        const result = await callWithCatch(() =>
+            this.db.dbDrizzle.select().from(GoalsSchema).where(and(...conditions))
+        );
+        if (!result) {
+            return [];
+        }
+
+        return result;
+    }
+}

@@ -1,0 +1,88 @@
+# TaskView — visitor demo (pre-loaded sample data)
+# Read README.md for demo login credentials.
+
+networks:
+  backend:
+
+services:
+  db:
+    image: postgres:17
+    restart: unless-stopped
+    env_file:
+      - ./.env.postgresql
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    ports:
+      - "${POSTGRES_HOST_PORT:-5433}:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $$POSTGRES_USER -d $$POSTGRES_DB"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+    networks: [backend]
+
+  migration:
+    image: gimanhead/taskview-ce-db-migration:latest
+    restart: "no"
+    depends_on:
+      db:
+        condition: service_healthy
+    env_file:
+      - ./.env.taskview
+    networks: [backend]
+
+  taskview-api-server:
+    image: gimanhead/taskview-ce-api-server:latest
+    restart: unless-stopped
+    ports:
+      - "${API_HOST_PORT:-1725}:1401"
+    depends_on:
+      db:
+        condition: service_healthy
+      migration:
+        condition: service_completed_successfully
+    env_file:
+      - ./.env.taskview
+    networks: [backend]
+
+  seed-demo:
+    image: oven/bun:1
+    restart: "no"
+    depends_on:
+      taskview-api-server:
+        condition: service_started
+    volumes:
+      - ./seed:/app
+    working_dir: /app
+    environment:
+      API_URL: http://taskview-api-server:1401
+      DEMO_LOGIN: visitor
+      DEMO_PASSWORD: visitor!!
+      DEMO_EMAIL: visitor@demo.taskview.local
+      DB_HOST: db
+      DB_USER: taskview_demo
+      DB_PASSWORD: demo_db_pass_change_me
+      DB_NAME: taskview_demo
+      DB_PORT: 5432
+    command: ["sh", "-c", "bun install && bun run seed-demo.ts"]
+    networks: [backend]
+
+  taskview-ce-webapp:
+    image: gimanhead/taskview-ce-webapp:latest
+    restart: unless-stopped
+    ports:
+      - "${WEB_HOST_PORT:-8888}:80"
+    environment:
+      TASKVIEW_API_URL: "http://localhost:${API_HOST_PORT:-1725}"
+      TASKVIEW_DEMO_LOGIN: visitor
+      TASKVIEW_DEMO_PASSWORD: visitor!!
+      TASKVIEW_DEMO_HIDE_REGISTRATION: "true"
+    depends_on:
+      taskview-api-server:
+        condition: service_started
+      seed-demo:
+        condition: service_completed_successfully
+    networks: [backend]
+
+volumes:
+  pgdata:

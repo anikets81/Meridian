@@ -1,0 +1,17 @@
+FROM node:24.12.0-alpine
+RUN apk add --no-cache postgresql-client
+
+# ENV DB_HOST=localhost
+# ENV DB_USER=tvdbuser
+# ENV DB_PASSWORD=tvdbpass
+# ENV DB_NAME=taskviewdb
+# ENV DB_PORT=5432
+
+WORKDIR /app-migration
+COPY ./dist-migration/taskview ./taskview
+COPY ./dist-migration/taskview-db-migration.js ./
+COPY entrypoint.sh /entrypoint.sh
+
+RUN chmod +x /entrypoint.sh
+
+ENTRYPOINT ["/entrypoint.sh"]

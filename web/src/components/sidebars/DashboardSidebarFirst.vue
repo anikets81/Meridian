@@ -1,0 +1,52 @@
+<template>
+  <UDashboardSidebar
+    id="default"
+    v-model:open="isSidebarOpen"
+    :default-size="20"
+    class="premium-glass-panel !bg-[color:var(--tv-premium-surface)]/85"
+    :class="isSidebarCollapsed ? 'overflow-hidden min-w-0 w-0 transition-[width] duration-200 linear' : 'transition-[width] duration-200 linear'"
+    :ui="{ footer: 'lg:border-t lg:border-[color:var(--tv-premium-border)]' }"
+  >
+    <div class="flex items-center justify-between px-1 gap-2">
+      <TvGoalLikeItem
+        :to="{ name: 'user' }"
+        variant="taskview"
+        class="flex-1"
+      >
+        {{ t('main') }}
+      </TvGoalLikeItem>
+      <ActiveTimerIndicator />
+      <NotificationBell />
+    </div>
+
+    <div class="flex items-stretch gap-2">
+      <SidebarInboxLink class="flex-1" />
+      <SidebarDefaultProjectLink />
+    </div>
+    <SidebarWorkspaceLinks />
+
+    <USeparator />
+
+    <ProjectsSidebar />
+
+    <template #footer="{ collapsed }">
+      <UserMenu :collapsed="collapsed" />
+    </template>
+  </UDashboardSidebar>
+</template>
+
+<script setup lang="ts">
+import { useI18n } from 'vue-i18n'
+import { useDashboard } from '@/composables/useDashboard'
+import TvGoalLikeItem from '@/components/features/base/TvGoalLikeItem.vue'
+import ProjectsSidebar from '@/components/features/projects/ProjectsSidebar.vue'
+import SidebarInboxLink from '@/components/sidebars/SidebarInboxLink.vue'
+import SidebarDefaultProjectLink from '@/components/sidebars/SidebarDefaultProjectLink.vue'
+import SidebarWorkspaceLinks from '@/components/sidebars/SidebarWorkspaceLinks.vue'
+import NotificationBell from '@/components/NotificationBell.vue'
+import ActiveTimerIndicator from '@/components/ActiveTimerIndicator.vue'
+import UserMenu from '@/components/UserMenu.vue'
+
+const { t } = useI18n()
+const { isSidebarOpen, isSidebarCollapsed } = useDashboard()
+</script>

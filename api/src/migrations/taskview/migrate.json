@@ -1,0 +1,719 @@
+{
+    "0": {
+        "version": "1.0.0",
+        "name": "Primum",
+        "releaseDate": "20220313",
+        "scripts": [],
+        "description": [
+            "Created Goals section",
+            "Add goals",
+            "Edit goals",
+            "Delete goals",
+            "Added permissions for goals",
+            "Components section",
+            "Add component list",
+            "Edit component list"
+        ]
+    },
+    "1": {
+        "version": "1.0.1",
+        "name": "Admin start",
+        "releaseDate": "20220313",
+        "scripts": [],
+        "description": [
+            "Added admin tables"
+        ]
+    },
+    "2": {
+        "version": "1.1.0",
+        "name": "Primus gradus",
+        "releaseDate": "20220424",
+        "scripts": [
+            "/1.1.0/tasks_priority.sql",
+            "/1.1.0/tasks_priority_column.sql",
+            "/1.1.0/tasks_tags.sql",
+            "/1.1.0/tasks_to_tags.sql",
+            "/1.1.0/update-permissions.sql",
+            "/1.1.0/trigger_set_task_permissions.sql"
+        ],
+        "description": [
+            "Dynamic task list loading",
+            "Hide completed tasks",
+            "Toggle completed and incomplete tasks",
+            "Added priority for tasks",
+            "Added tags for tasks",
+            "Added permissions for tags and priorities"
+        ]
+    },
+    "3": {
+        "version": "1.2.0",
+        "name": "Quaerere",
+        "releaseDate": "20220525",
+        "scripts": [],
+        "description": [
+            "Search tasks",
+            "Edit tags",
+            "Bug fixes"
+        ]
+    },
+    "4": {
+        "version": "1.3.0",
+        "name": "Fabula",
+        "releaseDate": "20220615",
+        "scripts": [
+            "/1.3.0/log_changes_tasks_goal-lists.sql",
+            "/1.3.0/log_changes_tasks_goals.sql",
+            "/1.3.0/log_changes_tasks_tasks.sql",
+            "/1.3.0/trigger_set_task_permissions.sql",
+            "/1.3.0/update-permissions.sql"
+        ],
+        "description": [
+            "Added history for tasks",
+            "Added history recovery for tasks",
+            "Added permissions for tasks"
+        ]
+    },
+    "5": {
+        "version": "1.4.0",
+        "name": "Release",
+        "releaseDate": "20240511",
+        "scripts": [
+            "/1.4.0/1.add-field-to-tags.sql"
+        ],
+        "description": [
+            "Added server seelection for login page",
+            "Added option for tag to changing tag scope from 'global' to 'project'"
+        ]
+    },
+    "6": {
+        "version": "1.4.1",
+        "name": "Release 1.4.1",
+        "releaseDate": "20240518",
+        "scripts": [
+            "/1.4.1/1.account-deletion.sql",
+            "/1.4.1/2.update-tags-constraint.sql"
+        ],
+        "description": [
+            "Oportunity delete account"
+        ]
+    },
+    "7": {
+        "version": "1.5.0",
+        "name": "Release 1.5.0",
+        "releaseDate": "20240521",
+        "scripts": [
+            "/1.5.0/1.add-archive-column.sql"
+        ],
+        "description": [
+            "Archive goals and lists",
+            "UX/UI enhancement"
+        ]
+    },
+    "8": {
+        "version": "1.6.0",
+        "name": "Release 1.6.0",
+        "releaseDate": "20240907",
+        "scripts": [
+            "/1.6.0/1.collaboration-schema.sql",
+            "/1.6.0/2.collaboration-roles.sql",
+            "/1.6.0/3.extend-permissions.sql",
+            "/1.6.0/4.collaboration-users-to-roles.sql",
+            "/1.6.0/5.add-permissions.sql",
+            "/1.6.0/6.delete-all-unused-data.sql",
+            "/1.6.0/7.add-task-dedline-columns.sql",
+            "/1.6.0/8.fixes.sql",
+            "/1.6.0/9.relation-table-task-assign.sql",
+            "/1.6.0/10.indexes_for_search.sql",
+            "/1.6.0/11.goal_id_for_task.sql",
+            "/1.6.0/12.add_default_user_data.sql"
+        ],
+        "description": [
+            "Added collaboration funcs"
+        ]
+    },
+    "9": {
+        "version": "1.6.1",
+        "name": "Release 1.6.1",
+        "releaseDate": "20240908",
+        "scripts": [
+            "/1.6.1/1.check-task-dates.sql",
+            "/1.6.1/2.add-jsonb-permission-description.sql",
+            "/1.6.1/3.delete-base-group-for-tv-users.sql",
+            "/1.6.1/4.add-locales-for-permissions.sql",
+            "/1.6.1/5.default-roles-for-project.sql"
+        ],
+        "description": [
+            "Release 1.6.1"
+        ]
+    },
+    "10": {
+        "version": "1.7.0",
+        "name": "Release 1.7.0",
+        "releaseDate": "20240920",
+        "scripts": [
+            "/1.7.0/1.trigger-for-project-owner-in-collaboration.sql",
+            "/1.7.0/2.update-owner-users-in-collaboration.sql",
+            "/1.7.0/3.delete-default-data.sql",
+            "/1.7.0/4.refactor-dates.sql",
+            "/1.7.0/5.control-dates-overlap.sql"
+        ],
+        "description": [
+            "Release 1.7.0"
+        ]
+    },
+    "11": {
+        "version": "1.8.0",
+        "name": "Release 1.8.0",
+        "releaseDate": "20240920",
+        "scripts": [
+            "/1.8.0/0.1.8.0.sql"
+        ],
+        "description": [
+            "Release 1.8.0"
+        ]
+    },
+    "12": {
+        "version": "1.8.1",
+        "name": "Release 1.8.1",
+        "releaseDate": "20240921",
+        "scripts": [
+            "/1.8.1/0.1.8.1.sql"
+        ],
+        "description": [
+            "Release 1.8.1"
+        ]
+    },
+    "13": {
+        "version": "1.9.0",
+        "name": "Release 1.9.0",
+        "releaseDate": "20250225",
+        "scripts": [
+            "/1.9.0/0.1.9.0.sql"
+        ],
+        "description": [
+            "Release 1.9.0"
+        ]
+    },
+    "14": {
+        "version": "1.9.1",
+        "name": "Release 1.9.1",
+        "releaseDate": "20250303",
+        "scripts": [
+            "/1.9.1/0.1.9.1.sql"
+        ],
+        "description": [
+            "Release 1.9.1"
+        ]
+    },
+    "15": {
+        "version": "1.9.2",
+        "name": "Release 1.9.2",
+        "releaseDate": "20250308",
+        "scripts": [
+            "/1.9.2/0.1.9.2.sql"
+        ],
+        "description": [
+            "Release 1.9.2"
+        ]
+    },
+    "16": {
+        "version": "1.9.3",
+        "name": "Release 1.9.3",
+        "releaseDate": "20250309",
+        "scripts": [
+            "/1.9.3/0.1.9.3.sql"
+        ],
+        "description": [
+            "Release 1.9.3"
+        ]
+    },
+    "17": {
+        "version": "1.10.0",
+        "name": "Release 1.10.0",
+        "releaseDate": "20250405",
+        "scripts": [
+            "/1.10.0/0.1.10.0.sql"
+        ],
+        "description": [
+            "Release 1.10.0"
+        ]
+    },
+    "18": {
+        "version": "1.13.0",
+        "name": "Release 1.13.0",
+        "releaseDate": "20250420",
+        "scripts": [
+            "/1.13.0/0.1.13.0.sql"
+        ],
+        "description": [
+            "Release 1.13.0"
+        ]
+    },
+    "19": {
+        "version": "1.14.3",
+        "name": "Release 1.14.3",
+        "releaseDate": "20250916",
+        "scripts": [
+            "/1.14.3/0.1.14.3-triggers.sql"
+        ],
+        "description": [
+            "Release 1.14.3"
+        ]
+    },
+    "20": {
+        "version": "1.15.0",
+        "name": "Release 1.15.0",
+        "releaseDate": "20250916",
+        "scripts": [
+            "/1.15.0/0.1.15.0.sql",
+            "/1.15.0/0.1.15.0-triggers.sql"
+        ],
+        "description": [
+            "Release 1.15.0 Graph"
+        ]
+    },
+    "21": {
+        "version": "1.16.0",
+        "name": "Release 1.16.0",
+        "releaseDate": "20251228",
+        "scripts": [
+            "/1.16.0/0.1.16.0.sql"
+        ],
+        "description": [
+            "Release 1.16.0"
+        ]
+    },
+    "22": {
+        "version": "1.18.2",
+        "name": "Release 1.18.2",
+        "releaseDate": "20260108",
+        "scripts": [
+            "/1.18.2/0.1.18.2.sql",
+            "/1.18.2/all-triggers.sql"
+        ],
+        "description": [
+            "Release 1.18.2"
+        ]
+    },
+    "23": {
+        "version": "1.20.0",
+        "name": "Release 1.20.0",
+        "releaseDate": "20260221",
+        "scripts": [
+            "/1.20.0/all-triggers.sql"
+        ],
+        "description": [
+            "Validate tag and task belong to the same project on insert into tasks_to_tags"
+        ]
+    },
+    "24": {
+        "version": "1.21.0",
+        "name": "Release 1.21.0",
+        "releaseDate": "20260302",
+        "scripts": [
+            "/1.21.0/0.1.21.0.sql"
+        ],
+        "description": [
+            "Added integrations table for GitHub/GitLab integration",
+            "Added integration_task_map table for issue-task mapping"
+        ]
+    },
+    "25": {
+        "version": "1.22.0",
+        "name": "Release 1.22.0",
+        "releaseDate": "20260304",
+        "scripts": [
+            "/1.22.0/0.1.22.0.sql"
+        ],
+        "description": [
+            "Added last_synced_at column to integrations for incremental sync"
+        ]
+    },
+    "26": {
+        "version": "1.23.0",
+        "name": "Release 1.23.0",
+        "releaseDate": "20260314",
+        "scripts": [
+            "/1.23.0/0.1.23.0.sql"
+        ],
+        "description": [
+            "Added source_url column to tasks for external issue links"
+        ]
+    },
+    "27": {
+        "version": "1.24.0",
+        "name": "Release 1.24.0",
+        "releaseDate": "20260315",
+        "scripts": [
+            "/1.24.0/0.1.24.0.sql"
+        ],
+        "description": [
+            "Added reminders, notifications, and push_subscriptions tables"
+        ]
+    },
+    "28": {
+        "version": "1.25.0",
+        "name": "Release 1.25.0",
+        "releaseDate": "20260317",
+        "scripts": [
+            "/1.25.0/0.1.25.0.sql"
+        ],
+        "description": [
+            "Added type column to notifications table"
+        ]
+    },
+    "29": {
+        "version": "1.26.0",
+        "name": "Release 1.26.0",
+        "releaseDate": "20260320",
+        "scripts": [
+            "/1.26.0/0.1.26.0.sql"
+        ],
+        "description": [
+            "Added notification_preferences table with JSONB settings"
+        ]
+    },
+    "30": {
+        "version": "1.27.0",
+        "name": "Release 1.27.0",
+        "releaseDate": "20260322",
+        "scripts": [
+            "/1.27.0/0.1.27.0.sql"
+        ],
+        "description": [
+            "Added webhooks and webhook_deliveries tables"
+        ]
+    },
+    "31": {
+        "version": "1.28.0",
+        "name": "Fix missing 1.25.0 migrations",
+        "releaseDate": "20260323",
+        "scripts": [
+            "/1.28.0/0.fix-missing-1.25.0-migrations.sql"
+        ],
+        "description": [
+            "Fix: apply missing migrations from 1.25.0 - convert TIMETZ to TIME and add timezone column to device_tokens"
+        ]
+    },
+    "32": {
+        "version": "1.29.0",
+        "name": "Release 1.29.0",
+        "releaseDate": "20260328",
+        "scripts": [
+            "/1.29.0/0.1.29.0.sql"
+        ],
+        "description": [
+            "Added api_tokens table for personal access tokens"
+        ]
+    },
+    "33": {
+        "version": "1.30.0",
+        "name": "Release 1.30.0",
+        "releaseDate": "20260328",
+        "scripts": [
+            "/1.30.0/0.1.30.0.sql"
+        ],
+        "description": [
+            "Added allowed_goal_ids column to api_tokens for project-scoped tokens"
+        ]
+    },
+    "34": {
+        "version": "1.31.0",
+        "name": "Release 1.31.0",
+        "releaseDate": "20260328",
+        "scripts": [
+            "/1.31.0/0.1.31.0.sql",
+            "/1.31.0/all-triggers.sql"
+        ],
+        "description": [
+            "Remove JWT storage from user_tokens, add session metadata (device_name, user_agent, last_used_at)",
+            "Add trigger to remove user from task assignees when removed from project collaboration"
+        ]
+    },
+    "35": {
+        "version": "1.32.0",
+        "name": "Release 1.32.0",
+        "releaseDate": "20260404",
+        "scripts": [
+            "/1.32.0/0.1.32.0.sql",
+            "/1.32.0/1.migrate-organizations.sql"
+        ],
+        "description": [
+            "Added organizations and organization_members tables",
+            "Migrate existing users to personal workspaces",
+            "Added organization_id column to goals"
+        ]
+    },
+    "36": {
+        "version": "1.33.0",
+        "name": "Release 1.33.0",
+        "releaseDate": "20260411",
+        "scripts": [
+            "/1.33.0/0.1.33.0.sql",
+            "/1.33.0/1.add-saml-signing-fields.sql",
+            "/1.33.0/2.add-saml-logout-url.sql",
+            "/1.33.0/3.add-scim-fields.sql"
+        ],
+        "description": [
+            "Added SSO support (SAML 2.0 + OIDC)",
+            "Added sso_configs, sso_identities, saml_request_cache tables",
+            "Added SAML AuthnRequest signing support",
+            "Added SAML logout URL for SLO",
+            "Added SCIM provisioning support"
+        ]
+    },
+    "37": {
+        "version": "1.44.0",
+        "name": "Release 1.44.0",
+        "releaseDate": "20260418",
+        "scripts": [
+            "/1.44.0/0.create-missing-personal-orgs.sql"
+        ],
+        "description": [
+            "Create personal organizations for users without any organization membership"
+        ]
+    },
+    "38": {
+        "version": "1.45.0",
+        "name": "Release 1.45.0",
+        "releaseDate": "20260425",
+        "scripts": [
+            "/1.45.0/0.analytics_indexes.sql"
+        ],
+        "description": [
+            "Add composite indexes on tasks.tasks for analytics queries"
+        ]
+    },
+    "39": {
+        "version": "1.46.0",
+        "name": "Release 1.46.0",
+        "releaseDate": "20260426",
+        "scripts": [
+            "/1.46.0/0.add-analytics-permission.sql"
+        ],
+        "description": [
+            "Add analytics_can_view permission for project-level analytics access"
+        ]
+    },
+    "40": {
+        "version": "1.47.0",
+        "name": "Release 1.47.0",
+        "releaseDate": "20260509",
+        "scripts": [
+            "/1.47.0/0.analytics_indexes_v2.sql"
+        ],
+        "description": [
+            "Add indexes on tasks_auth.task_assignee, collaboration.users_to_goals, tasks.task_relations(to_task_id) for analytics joins",
+            "Add partial index on tasks.goals(organization_id) WHERE archive = 0 for analytics goal lookup",
+            "Add partial index on tasks.tasks(goal_id) WHERE complete IS NOT TRUE for open-task analytics queries"
+        ]
+    },
+    "41": {
+        "version": "1.48.0",
+        "name": "Release 1.48.0",
+        "releaseDate": "20260511",
+        "scripts": [
+            "/1.48.0/0.create-time-entries.sql",
+            "/1.48.0/1.create-time-entries-history.sql",
+            "/1.48.0/2.alter-organizations-add-autostop.sql",
+            "/1.48.0/3.add-timetracking-permissions.sql",
+            "/1.48.0/all-triggers.sql"
+        ],
+        "description": [
+            "Added time-tracking module: tasks.time_entries with one-active-timer-per-user partial unique index",
+            "Added history.time_entries audit table with FK ON DELETE CASCADE to time_entries (history removed with the entry)",
+            "Added time_tracking_autostop_hours column to tv_auth.organizations (default 24, NULL = disabled)",
+            "Added timetracking_can_log and timetracking_can_manage_all goal-level permissions (granted to new projects only, matching the 1.46.0 analytics convention)",
+            "all-triggers.sql: updated add_roles_and_permissions function with new permissions; added log_changes_time_entries trigger (BEFORE UPDATE writes JSONB snapshot to history.time_entries)"
+        ]
+    },
+    "42": {
+        "version": "1.49.0",
+        "name": "Release 1.49.0",
+        "releaseDate": "20260512",
+        "scripts": [
+            "/1.49.0/0.time_entries_report_indexes.sql"
+        ],
+        "description": [
+            "Added compound indexes on tasks.time_entries (goal_id, started_at, user_id) and (goal_id, started_at, task_id) for time-tracking report aggregations",
+            "Added partial index on tasks.time_entries(goal_id, started_at) WHERE billable = TRUE for billable-only reports"
+        ]
+    },
+    "43": {
+        "version": "1.50.0",
+        "name": "Release 1.50.0",
+        "releaseDate": "20260515",
+        "scripts": [
+            "/1.50.0/0.update-timetracking-permissions-descriptions.sql"
+        ],
+        "description": [
+            "Updated descriptions of timetracking_can_view and timetracking_can_manage_all to document that these permissions also expose contributor emails through the time-entry log",
+            "Tightened timetracking_can_log description: it grants only start/stop/createManual, NOT edit/delete (including own entries). Edit/delete now requires timetracking_can_manage_all — see can-access-time-entry middleware change."
+        ]
+    },
+    "44": {
+        "version": "1.51.0",
+        "name": "Release 1.51.0",
+        "releaseDate": "20260517",
+        "scripts": [
+            "/1.51.0/0.tasks_to_tags_indexes.sql"
+        ],
+        "description": [
+            "Added btree indexes on tasks.tasks_to_tags(task_id) and (tag_id) — FK constraints do not create indexes in Postgres, so anti-joins (NOT EXISTS for untagged tasks) and inner joins from tasks were seq-scanning. Needed for tag-financial analytics charts."
+        ]
+    },
+    "45": {
+        "version": "1.52.0",
+        "name": "Release 1.52.0",
+        "releaseDate": "20260517",
+        "scripts": [
+            "/1.52.0/0.ui_preferences.sql"
+        ],
+        "description": [
+            "Added tv_auth.ui_preferences table: per-user JSONB storage of UI customization choices (which analytics charts and task detail fields are shown and in what order). One row per user keyed by user_id."
+        ]
+    },
+    "46": {
+        "version": "1.53.0",
+        "name": "Release 1.53.0",
+        "releaseDate": "20260528",
+        "scripts": [
+            "/1.53.0/0.create-sprints.sql",
+            "/1.53.0/1.create-sprint-task-outcomes.sql",
+            "/1.53.0/2.create-sprint-user-capacity.sql",
+            "/1.53.0/3.create-sprint-retros.sql",
+            "/1.53.0/4.alter-tasks-add-sprint.sql",
+            "/1.53.0/5.alter-notifications-add-sprint-id.sql",
+            "/1.53.0/6.add-sprint-permissions.sql",
+            "/1.53.0/7.alter-goals-add-estimate-unit.sql",
+            "/1.53.0/8.alter-sprint-task-outcomes-add-estimate.sql",
+            "/1.53.0/9.create-sprint-cadence.sql",
+            "/1.53.0/all-triggers.sql"
+        ],
+        "description": [
+            "Added tasks.goals.estimate_unit ('hours' | 'points', default 'points') — per-project unit for sprint estimates & capacity display.",
+            "Sprints feature. tasks.sprints: sprint container with lifecycle draft/planned/active/review/completed; one active-or-review sprint per project enforced by a partial unique index.",
+            "tasks.sprint_task_outcomes: per-task result decided at close (accepted/carried-over/dropped/incomplete). tasks.sprint_user_capacity: per-user capacity. tasks.sprint_retros: went well/bad/action items. Sprint capacity column is `capacity` (story points, unitless).",
+            "Extended tasks.tasks with sprint_id (FK SET NULL) and estimate_value (task estimate in story points, unitless), and tasks.notifications with sprint_id. Sprint availability is governed by the sprint_can_view permission (RBAC), not a per-project flag. Sprint burndown reuses the existing trigger-maintained tasks.date_complete column (no new completion column added).",
+            "Added permission group 5 'sprints' and permissions sprint_can_view, sprint_can_manage, sprint_can_assign_tasks, sprint_can_view_analytics; backfilled grants for existing projects' editor/executor roles.",
+            "all-triggers.sql: re-applies all triggers idempotently (drop+create) and updates tasks.add_roles_and_permissions() so NEW projects grant sprint permissions to editor (all four) and executor (view + assign).",
+            "Added tasks.sprint_task_outcomes.estimate_value — story-points snapshot captured at sprint close so a closed sprint's velocity is frozen (unaffected by later estimate edits or moving the task to another sprint).",
+            "Added tasks.sprint_cadence — per-project sprint auto-generation config (Linear-style): enabled, length_days, start_date anchor, lookahead, name_template, last_generated_date. A background job keeps current + lookahead future sprints created."
+        ]
+    },
+    "47": {
+        "version": "1.54.0",
+        "name": "Release 1.54.0",
+        "releaseDate": "20260605",
+        "scripts": [
+            "/1.54.0/0.create-recurrence-rules.sql",
+            "/1.54.0/1.create-recurrence-skip-dates.sql",
+            "/1.54.0/2.create-recurrence-template-assignees.sql",
+            "/1.54.0/3.create-recurrence-template-tags.sql",
+            "/1.54.0/4.alter-tasks-add-recurrence.sql"
+        ],
+        "description": [
+            "Recurring tasks (lazy materialization, Todoist-like UX). tasks.recurrence_rules: one row per series — RFC 5545 RRULE string, floating wall-clock dtstart, IANA timezone, state active/paused/ended, last_instance_date + instances_created drive next-occurrence computation. Template snapshot columns (description/note/priority/status/list/duration) let the series outlive its origin task.",
+            "tasks.recurrence_skip_dates: per-rule skipped occurrence dates. tasks.recurrence_template_assignees / recurrence_template_tags: snapshot of assignees (collaboration.users) and tags copied onto each materialized instance.",
+            "Extended tasks.tasks with recurrence_rule_id (FK SET NULL — instances survive rule deletion) and recurrence_instance_date. Partial unique index on (recurrence_rule_id, recurrence_instance_date) makes instance materialization idempotent under concurrent triggers/reconciliation.",
+            "Exactly one open instance per series exists at any time: completing it materializes the next occurrence (event-driven, O(1)); a nightly pg-boss reconcile job re-creates the open instance only for series stalled by a crash. No new permissions — recurrence editing is gated by existing task_can_edit_deadline."
+        ]
+    },
+    "48": {
+        "version": "1.54.1",
+        "name": "Release 1.54.1",
+        "releaseDate": "20260613",
+        "scripts": [
+            "/1.54.1/0.add-recurrence-template-task-unique.sql"
+        ],
+        "description": [
+            "Partial unique index on tasks.recurrence_rules(template_task_id) WHERE state != 'ended' — one live series per origin task. DB-level backstop for the createRule race where two concurrent POSTs both pass the recurrenceRuleId == null check and create two rules for the same task (the orphaned rule would materialize a duplicate card via the nightly reconcile job)."
+        ]
+    },
+    "49": {
+        "version": "1.54.2",
+        "name": "Release 1.54.2",
+        "releaseDate": "20260613",
+        "scripts": [
+            "/1.54.2/0.add-recurrence-has-time.sql"
+        ],
+        "description": [
+            "Added tasks.recurrence_rules.has_time — explicit flag for whether a series is anchored to a wall-clock time or is date-only. Previously the code inferred 'no time' from a midnight dtstart, which silently collapsed an explicit 00:00 series into date-only. Backfill (has_time = dtstart::time <> '00:00:00') reproduces the old inference so existing series keep their behavior; new series carry the flag through from the origin task's start_time (null = date-only, set = timed, including midnight)."
+        ]
+    },
+    "50": {
+        "version": "1.55.0",
+        "name": "Release 1.55.0",
+        "releaseDate": "20260628",
+        "scripts": [
+            "/1.55.0/0.alter-goals-add-is-inbox.sql",
+            "/1.55.0/1.backfill-inbox-goals.sql",
+            "/1.55.0/2.unique-inbox-per-org.sql"
+        ],
+        "description": [
+            "Added tasks.goals.is_inbox (BOOLEAN NOT NULL DEFAULT FALSE) — flags a project as the user's personal Inbox. One Inbox per personal organization, auto-created at signup and guarded against deletion and archival in GoalsManager.",
+            "Backfill: for every personal organization without an Inbox, inserts one tasks.goals row (name='Inbox', is_inbox=true, owner=the org owner, organization_id=the org). The existing AFTER INSERT triggers fully provision it like any project — default kanban statuses, the owner added to collaboration, and the default editor/executor roles with their permissions. Idempotent — skips orgs that already have an Inbox.",
+            "Partial unique index goals_one_inbox_per_org_uidx ON tasks.goals (organization_id) WHERE is_inbox — enforces at most one Inbox per organization at the DB level, hardening the check-then-insert against concurrent races."
+        ]
+    },
+    "51": {
+        "version": "1.56.0",
+        "name": "Messaging integrations",
+        "releaseDate": "20260701",
+        "scripts": [
+            "/1.56.0/0.create-messaging-tables.sql",
+            "/1.56.0/1.alter-messaging-add-events.sql"
+        ],
+        "description": [
+            "Messaging integrations module (Slack / Telegram)",
+            "Outbound delivery connections for personal and project/org owners",
+            "Pending link tokens for binding + user identity map",
+            "Per-connection event subscription (which events to deliver)"
+        ]
+    },
+    "52": {
+        "version": "1.57.0",
+        "name": "Unique project membership",
+        "releaseDate": "20260702",
+        "scripts": [
+            "/1.57.0/0.unique-users-to-goals.sql"
+        ],
+        "description": [
+            "Deduplicate collaboration.users_to_goals rows",
+            "Unique index on (user_id, goal_id) — one membership per user per project"
+        ]
+    },
+    "53": {
+        "version": "1.58.0",
+        "name": "Messaging channel post-content flag",
+        "releaseDate": "20260702",
+        "scripts": [
+            "/1.58.0/0.alter-messaging-add-post-content.sql"
+        ],
+        "description": [
+            "Per-connection opt-out for posting task description to project channels"
+        ]
+    },
+    "54": {
+        "version": "1.59.0",
+        "name": "Messaging identity workspace scoping",
+        "releaseDate": "20260705",
+        "scripts": [
+            "/1.59.0/0.alter-messaging-identity-add-team.sql"
+        ],
+        "description": [
+            "Add external_team_id to messaging_identity_map so Slack identities are keyed by (provider, team, user) — prevents cross-workspace identity collision"
+        ]
+    },
+    "55": {
+        "version": "1.60.0",
+        "name": "Recurrence schedule mode",
+        "releaseDate": "20260712",
+        "scripts": [
+            "/1.60.0/0.alter-recurrence-add-schedule-mode.sql"
+        ],
+        "description": [
+            "Add schedule_mode to recurrence_rules: 'fixed' (calendar schedule) or 'after-completion' (next occurrence = completion day + interval)"
+        ]
+    }
+}

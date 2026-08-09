@@ -1,0 +1,190 @@
+<template>
+  <div class="flex flex-col gap-3">
+    <div class="flex gap-2">
+      <UPopover
+        v-model:open="startOpen"
+        :ui="{ content: 'rounded-16' }"
+      >
+        <UButton
+          :label="formattedStart"
+          data-testid="time-form-start"
+          icon="i-lucide-calendar"
+          color="neutral"
+          variant="outline"
+          size="lg"
+          class="flex-1"
+          :ui="{ base: 'rounded-xl justify-start' }"
+        />
+        <template #content>
+          <div class="p-2 flex flex-col gap-2">
+            <UCalendar
+              v-model="startDate"
+              :max-value="endDate"
+              :week-starts-on="weekStart"
+            />
+            <UInputTime
+              v-model="startTime"
+              :hour-cycle="24"
+              :ui="{ base: 'justify-center' }"
+            />
+          </div>
+        </template>
+      </UPopover>
+
+      <UPopover v-model:open="endOpen">
+        <UButton
+          :label="formattedEnd"
+          data-testid="time-form-end"
+          icon="i-lucide-calendar-check"
+          color="neutral"
+          variant="outline"
+          size="lg"
+          class="flex-1"
+          :ui="{ base: 'rounded-xl justify-start' }"
+        />
+        <template #content>
+          <div class="p-2 flex flex-col gap-2">
+            <UCalendar
+              v-model="endDate"
+              :min-value="startDate"
+              :week-starts-on="weekStart"
+            />
+            <UInputTime
+              v-model="endTime"
+              :hour-cycle="24"
+              :ui="{ base: 'justify-center' }"
+            />
+          </div>
+        </template>
+      </UPopover>
+    </div>
+
+    <UFormField :label="t('timeTracking.description')">
+      <UInput
+        v-model="description"
+        size="lg"
+        variant="outline"
+        class="w-full"
+        :ui="{ base: 'rounded-xl' }"
+        data-testid="time-form-description"
+      />
+    </UFormField>
+
+    <UCheckbox
+      v-model="billable"
+      :label="t('timeTracking.billable')"
+      size="lg"
+    />
+
+    <div class="flex justify-end gap-2">
+      <UButton
+        :label="t('timeTracking.cancel')"
+        color="neutral"
+        variant="ghost"
+        @click="emit('cancel')"
+      />
+      <UButton
+        :label="submitLabel ?? t('timeTracking.save')"
+        color="primary"
+        :disabled="!isValid"
+        data-testid="time-form-save"
+        @click="onSubmit"
+      />
+    </div>
+  </div>
+</template>
+
+<script setup lang="ts">
+import { computed, ref, shallowRef } from 'vue'
+import { useI18n } from 'vue-i18n'
+import { useDateFormat } from '@vueuse/core'
+import { CalendarDate, Time } from '@internationalized/date'
+import { useWeekStart } from '@/composables/useWeekStart'
+
+const weekStart = useWeekStart()
+
+export type TimeEntryFormPayload = {
+  startedAt: string
+  endedAt: string
+  description: string
+  billable: boolean
+}
+
+const props = defineProps<{
+  initialStartedAt?: string
+  initialEndedAt?: string
+  initialDescription?: string
+  initialBillable?: boolean
+  submitLabel?: string
+}>()
+
+const emit = defineEmits<{
+  submit: [TimeEntryFormPayload]
+  cancel: []
+}>()
+
+const { t } = useI18n()
+
+const fromDate = (d: Date): { date: CalendarDate; time: Time } => ({
+  date: new CalendarDate(d.getFullYear(), d.getMonth() + 1, d.getDate()),
+  time: new Time(d.getHours(), d.getMinutes()),
+})
+
+const fromIso = (iso: string | undefined): { date?: CalendarDate; time?: Time } => {
+  if (!iso) return {}
+  return fromDate(new Date(iso))
+}
+
+const isEditMode = props.initialStartedAt !== undefined
+const defaultStart = fromDate(new Date(Date.now() - 60 * 60 * 1000))
+const defaultEnd = fromDate(new Date())
+
+const initialStart = isEditMode ? fromIso(props.initialStartedAt) : defaultStart
+const initialEnd = isEditMode ? fromIso(props.initialEndedAt) : defaultEnd
+
+const startDate = shallowRef<CalendarDate | undefined>(initialStart.date)
+const endDate = shallowRef<CalendarDate | undefined>(initialEnd.date)
+const startTime = shallowRef<Time | undefined>(initialStart.time)
+const endTime = shallowRef<Time | undefined>(initialEnd.time)
+const description = ref(props.initialDescription ?? '')
+const billable = ref(isEditMode ? props.initialBillable === true : true)
+
+const startOpen = ref(false)
+const endOpen = ref(false)
+
+const toJsDate = (date: CalendarDate | undefined, time: Time | undefined): Date | null => {
+  if (!date) return null
+  return new Date(date.year, date.month - 1, date.day, time?.hour ?? 0, time?.minute ?? 0)
+}
+
+const startJs = computed(() => toJsDate(startDate.value, startTime.value))
+const endJs = computed(() => toJsDate(endDate.value, endTime.value))
+
+const isValid = computed(() => {
+  if (!startJs.value || !endJs.value) return false
+  return endJs.value.getTime() > startJs.value.getTime()
+})
+
+const formatPair = (date: CalendarDate | undefined, time: Time | undefined, placeholder: string) => {
+  if (!date) return placeholder
+  const js = new Date(date.year, date.month - 1, date.day)
+  const datePart = useDateFormat(js, 'DD MMM').value
+  if (!time) return datePart
+  const h = String(time.hour).padStart(2, '0')
+  const m = String(time.minute).padStart(2, '0')
+  return `${datePart} ${h}:${m}`
+}
+
+const formattedStart = computed(() => formatPair(startDate.value, startTime.value, t('timeTracking.startedAt')))
+const formattedEnd = computed(() => formatPair(endDate.value, endTime.value, t('timeTracking.endedAt')))
+
+const onSubmit = () => {
+  if (!isValid.value || !startJs.value || !endJs.value) return
+  emit('submit', {
+    startedAt: startJs.value.toISOString(),
+    endedAt: endJs.value.toISOString(),
+    description: description.value,
+    billable: billable.value,
+  })
+}
+</script>

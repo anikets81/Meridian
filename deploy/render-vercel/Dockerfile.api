@@ -1,0 +1,47 @@
+# Production API image for Render (builds from monorepo root).
+# dockerContext must be the repository root (see render.yaml).
+
+FROM node:24-alpine AS builder
+
+RUN corepack enable && corepack prepare pnpm@9.15.0 --activate
+
+WORKDIR /app
+
+COPY package.json pnpm-lock.yaml pnpm-workspace.yaml ./
+COPY api/package.json ./api/
+COPY web/package.json ./web/
+COPY taskview-packages ./taskview-packages/
+
+RUN pnpm install --frozen-lockfile --config.engine-strict=false
+
+COPY api ./api
+
+WORKDIR /app/api
+RUN pnpm run build:docker \
+  && pnpm run build:migration \
+  && mkdir -p ./dist-migration/taskview \
+  && cp -R ./src/migrations/taskview/* ./dist-migration/taskview/ \
+  && node ./commands/copy-migration-files.js \
+  && cp ./production.package.json ./dist/package.json \
+  && cp ./production.ecosystem.config.js ./dist/ecosystem.config.js
+
+FROM node:24-alpine AS runner
+
+RUN apk add --no-cache curl postgresql-client \
+  && npm install pm2 -g
+
+WORKDIR /usr/src/app
+
+COPY --from=builder /app/api/dist ./
+RUN npm install --omit=dev
+
+COPY --from=builder /app/api/dist-migration /app-migration
+COPY deploy/render-vercel/docker-entrypoint.sh /entrypoint.sh
+RUN chmod +x /entrypoint.sh
+
+ENV NODE_ENV=production
+ENV PM2_INSTANCES=1
+ENV DB_POOL_MAX=10
+
+EXPOSE 1401
+CMD ["/entrypoint.sh"]

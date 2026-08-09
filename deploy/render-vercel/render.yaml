@@ -1,0 +1,65 @@
+# Render Blueprint — Meridian / TaskView API + PostgreSQL
+# Connect this repo in Render → New → Blueprint → set path: deploy/render-vercel/render.yaml
+
+databases:
+  - name: meridian-db
+    databaseName: taskviewdb
+    user: taskview
+    plan: free
+
+services:
+  - type: web
+    name: meridian-api
+    runtime: docker
+    plan: free
+    dockerfilePath: deploy/render-vercel/Dockerfile.api
+    dockerContext: .
+    healthCheckPath: /module/auth/login-options
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: DB_HOST
+        fromDatabase:
+          name: meridian-db
+          property: host
+      - key: DB_PORT
+        fromDatabase:
+          name: meridian-db
+          property: port
+      - key: DB_USER
+        fromDatabase:
+          name: meridian-db
+          property: user
+      - key: DB_PASSWORD
+        fromDatabase:
+          name: meridian-db
+          property: password
+      - key: DB_NAME
+        fromDatabase:
+          name: meridian-db
+          property: database
+      - key: JWT_ALG
+        value: HS256
+      - key: JWT_SIGN
+        generateValue: true
+      - key: ACCESS_LIFE_TIME
+        value: 3d
+      - key: REFRESH_LIFE_TIME
+        value: 9d
+      - key: AUTH_LOGIN_METHODS
+        value: password
+      - key: ALLOW_PUBLIC_REGISTRATION
+        value: true
+      - key: REQUIRE_EMAIL_CONFIRMATION
+        value: false
+      - key: PASSWORD_CHANGE_CONFIRMATION
+        value: password
+      # Set these after Vercel deploy (step 5 in README):
+      - key: APP_URL
+        sync: false
+      - key: CORS_ALLOWED_ORIGINS
+        sync: false
+      - key: API_URL
+        sync: false
+      - key: API_PUBLIC_URL
+        sync: false

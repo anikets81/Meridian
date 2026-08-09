@@ -1,0 +1,42 @@
+import { type } from 'arktype';
+import type { GoalsSchemaTypeForSelect } from 'taskview-db-schemas';
+import type { GoalPermissionsForClient } from '../../types/auth.types';
+
+export const GoalsArkTypeAdd = type({
+    name: 'string',
+    'description?': 'string | null',
+    'color?': 'string | null',
+    'organizationId?': 'number',
+});
+
+export type GoalsArgAdd = typeof GoalsArkTypeAdd.infer;
+
+export const GoalsArkTypeUpdate = type({
+    id: 'number',
+    'name?': 'string | null',
+    'description?': 'string | null',
+    'color?': 'string | null',
+    "estimateUnit?": "'hours' | 'points'",
+    'archive?': '0 | 1',
+});
+
+export type GoalsArgUpdate = typeof GoalsArkTypeUpdate.infer;
+
+export const GoalsArkTypeDelete = type({
+    goalId: 'number',
+});
+
+export type GoalsArgDelete = typeof GoalsArkTypeDelete.infer;
+
+export const GoalsArkTypeFetch = type({
+    'organizationId?': type('string | number').pipe((v) => Number(v)),
+});
+
+export type GoalsArgFetch = typeof GoalsArkTypeFetch.infer;
+
+export type GoalsItemForClientWithPermissions = GoalsSchemaTypeForSelect & { permissions: GoalPermissionsForClient };
+
+export type GoalsArgCreateInbox = {
+    ownerId: number;
+    organizationId: number;
+};

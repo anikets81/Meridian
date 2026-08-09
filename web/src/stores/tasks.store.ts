@@ -1,0 +1,663 @@
+import { defineStore } from 'pinia'
+import {
+  ALL_TASKS_LIST_ID,
+  type RecurrenceCreateArgs,
+  type RecurrenceRule,
+  type RecurrenceRuleDetails,
+  type RecurrenceUpdateArgs,
+  type TagItemArgToggle,
+  type Task,
+  type TaskArgAdd,
+  type TaskArgDelete,
+  type TaskArgToggleAssignee,
+  type TaskArgUpdate,
+  type TaskBase,
+} from 'taskview-api'
+import { $tvApi } from '@/plugins/axios'
+import { DEFAULT_ID } from '@/types/app.types'
+import { type TasksStoreState } from '@/types/tasks.types'
+import { useTagsStore } from './tag.store'
+import { isNotNullable, logError } from '@/helpers/Helper'
+
+export const useTasksStore = defineStore('tasks', {
+  state(): TasksStoreState {
+    return {
+      tasks: [],
+      selectedTask: null,
+      fetchRules: {
+        showCompleted: 0,
+        currentListId: DEFAULT_ID,
+        endOfTasks: false,
+        currentPage: 0,
+        searchText: '',
+        firstNew: 1,
+        sortBy: 'date',
+        filters: {},
+        goalId: -1,
+      },
+      loading: false,
+    }
+  },
+  actions: {
+    updateFetchRules(data: Partial<TasksStoreState['fetchRules']>) {
+      this.fetchRules = { ...this.fetchRules, ...data }
+    },
+
+    resetTasks() {
+      this.tasks = []
+    },
+
+    updateSelectedTask(task: Task) {
+      if (this.selectedTask && this.selectedTask.id === task.id) {
+        Object.assign(this.selectedTask, task)
+      }
+    },
+
+    async refreshTask(taskId: TaskBase['id']) {
+      const task = await $tvApi.tasks.fetchTaskById(taskId).catch(logError)
+      if (!task) return
+      this.updateSelectedTask(task)
+      const localTask = this.tasks.find((t) => t.id === taskId)
+      if (localTask) Object.assign(localTask, task)
+    },
+
+    async fetchTaskById(taskId: TaskBase['id']) {
+      if (taskId === this.selectedTask?.id) return
+
+      const task = await $tvApi.tasks.fetchTaskById(taskId).catch(logError)
+
+      if (!task) return
+
+      this.selectedTask = task
+    },
+
+    /** @deprecated */
+    setTaskOrder(data: Partial<Task>) {
+      const task = this.tasks.find((t) => data.id === t.id)
+      if (!task) return
+
+      if (isNotNullable(data.taskOrder)) {
+        task.taskOrder = data.taskOrder
+      }
+      if (isNotNullable(data.kanbanOrder)) {
+        task.kanbanOrder = data.kanbanOrder
+      }
+    },
+
+    // setTaskStatusId(data: TaskUpdateStatusIdArg) {
+
+    //     if (data.taskId === this.selectedTask?.id) {
+    //         this.selectedTask.statusId = data.statusId;
+    //     }
+
+    //     const task = this.tasks.find((tsk) => tsk.id === data.taskId);
+
+    //     if (!task) return;
+
+    //     task.statusId = data.statusId;
+    //     this.updateSelectedTask(task);
+    // },
+
+    /** @deprecated */
+    async updateOrders(data: TaskArgUpdate): Promise<Task | null> {
+      const task = await $tvApi.tasks.updateTask(data).catch(logError)
+      if (!task) return null
+
+      this.setTaskOrder(task)
+      return task
+    },
+
+    async addTask(taskArg: TaskArgAdd): Promise<false | Task> {
+      if (taskArg.goalListId === ALL_TASKS_LIST_ID) {
+        taskArg.goalListId = null
+      }
+
+      const task = await $tvApi.tasks.createTask(taskArg).catch(logError)
+      if (!task) return false
+
+      if (task.parentId) {
+        let mainTask = this.tasks.find((t) => t.id === task.parentId)
+
+        if (!mainTask && this.selectedTask?.id === task.parentId) {
+          mainTask = this.selectedTask
+        }
+
+        if (!mainTask) {
+          throw new Error('Main task not found for adding subtask')
+        }
+
+        mainTask.subtasks.push(task)
+
+        // Sync selectedTask if it's a separate object for the same parent
+        if (this.selectedTask && this.selectedTask !== mainTask && this.selectedTask.id === task.parentId) {
+          this.selectedTask.subtasks = mainTask.subtasks
+        }
+      } else if (!this.tasks.some((existing) => existing.id === task.id)) {
+        this.tasks.unshift(task)
+      }
+      return task
+    },
+
+    appendTasks(items: Task[]) {
+      const existingIds = new Set(this.tasks.map((task) => task.id))
+      this.tasks = [...this.tasks, ...items.filter((task) => !existingIds.has(task.id))]
+    },
+
+    async fetchAllTasks(goalId: number, showCompleted: 0 | 1 = 1, firstNew: 0 | 1 = 1, ignoreCompleted: boolean = false) {
+      this.loading = true
+      const searchParams = {
+        showCompleted: +showCompleted as 0 | 1,
+        goalId: +goalId,
+        firstNew: +firstNew as 0 | 1,
+        sortBy: this.fetchRules.sortBy,
+        componentId: ALL_TASKS_LIST_ID,
+        page: +this.fetchRules.currentPage,
+        searchText: this.fetchRules.searchText,
+        filters: this.fetchRules.filters,
+        unlimited: true,
+        ignoreCompleted: ignoreCompleted,
+      }
+
+      const tasks = await $tvApi.tasks
+        .fetch(searchParams)
+        .catch(logError)
+        .finally(() => {
+          this.loading = false
+        })
+      if (!tasks) return false
+      this.tasks = tasks
+
+      return false
+    },
+
+    async fetchTasks(): Promise<boolean> {
+      this.loading = true
+
+      const searchParams = {
+        showCompleted: +this.fetchRules.showCompleted as 0 | 1,
+        goalId: +this.fetchRules.goalId,
+        firstNew: +this.fetchRules.firstNew as 0 | 1,
+        sortBy: this.fetchRules.sortBy,
+        componentId: +this.fetchRules.currentListId,
+        page: +this.fetchRules.currentPage,
+        searchText: this.fetchRules.searchText,
+        filters: this.fetchRules.filters,
+      }
+
+      const tasks = await $tvApi.tasks
+        .fetch(searchParams)
+        .catch(logError)
+        .finally(() => {
+          this.loading = false
+        })
+      if (!tasks) return false
+
+      this.fetchRules.endOfTasks = tasks.length < 1
+      if (!this.fetchRules.endOfTasks) {
+        this.fetchRules.currentPage++
+      }
+      this.appendTasks(tasks)
+      return true
+    },
+
+    /**@todo rename to updateTaskComplete */
+    async updateTaskCompleteStatus(
+      data: TaskArgUpdate,
+      deleteCompleted: boolean = true,
+    ): Promise<{ complete: boolean; syncFailed?: boolean } | undefined> {
+      this.loading = true
+
+      const taskResult = await $tvApi.tasks
+        .updateTask(data)
+        .catch(logError)
+        .finally(() => {
+          this.loading = false
+        })
+
+      if (!taskResult) return undefined
+
+      // this.setTaskStatusId({ taskId: taskResult.id, statusId: taskResult.statusId });
+
+      const searchId = taskResult.parentId || taskResult.id
+
+      let parentTask: Task | undefined
+
+      parentTask = this.tasks.find((tsk: Task) => tsk.id === searchId)
+
+      if (!parentTask && searchId === this.selectedTask?.id) {
+        parentTask = this.selectedTask
+      }
+
+      if (!parentTask) {
+        return undefined
+      }
+
+      //we updating subtasks
+      if (taskResult.parentId) {
+        const subTask = parentTask.subtasks.find((sub) => sub.id === +taskResult.id)
+        if (subTask) {
+          Object.assign(subTask, taskResult)
+        }
+      } else {
+        //we updating main task
+        parentTask.complete = taskResult.complete
+        //we deleting task from list if deleteCompleted is true
+        // and task complete is different from showCompleted rule for fetching
+        if (deleteCompleted && !!this.fetchRules.showCompleted !== data.complete) {
+          //handle condition with showing tasks in diff mode (showCompleted)
+          await new Promise((resolve) => setTimeout(resolve, 500))
+          const taskIndex = this.tasks.findIndex((task) => task.id === taskResult.id)
+          if (taskIndex !== -1) {
+            this.tasks.splice(taskIndex, 1)
+          }
+        }
+      }
+
+      this.updateSelectedTask(parentTask)
+
+      return { complete: taskResult.complete, syncFailed: taskResult.syncFailed }
+    },
+
+    async updateTaskDescription(data: TaskArgUpdate): Promise<boolean> {
+      this.loading = true
+      const task = await $tvApi.tasks
+        .updateTask(data)
+        .catch(logError)
+        .finally(() => {
+          this.loading = false
+        })
+      if (!task) return false
+
+      const localTask = this.tasks.find(({ id }) => id === task.id)
+      if (localTask) {
+        Object.assign(localTask, task)
+      } else if (task.parentId) {
+        const parent = this.tasks.find(({ id }) => id === task.parentId)
+          ?? (this.selectedTask?.id === task.parentId ? this.selectedTask : null)
+        const subtask = parent?.subtasks.find((s) => s.id === task.id)
+        if (subtask) {
+          Object.assign(subtask, task)
+        }
+      }
+      this.updateSelectedTask(task)
+      return true
+    },
+
+    async deleteTask(id: TaskArgDelete): Promise<boolean> {
+      this.loading = true
+
+      const result = await $tvApi.tasks
+        .deleteTask(id)
+        .catch(logError)
+        .finally(() => {
+          this.loading = false
+        })
+
+      if (!result) return false
+
+      const taskIndex = this.tasks.findIndex((task) => task.id === id)
+
+      if (taskIndex !== -1) {
+        this.tasks.splice(taskIndex, 1)
+      } else {
+        // Check if it's a subtask
+        for (const task of this.tasks) {
+          const subIndex = task.subtasks.findIndex((s) => s.id === id)
+          if (subIndex !== -1) {
+            task.subtasks.splice(subIndex, 1)
+            break
+          }
+        }
+      }
+
+      if (this.selectedTask?.id === id) {
+        this.selectedTask = null
+      } else if (this.selectedTask) {
+        const subIndex = this.selectedTask.subtasks.findIndex((s) => s.id === id)
+        if (subIndex !== -1) {
+          this.selectedTask.subtasks.splice(subIndex, 1)
+        }
+      }
+
+      return true
+    },
+
+    async updateTaskNote(data: TaskArgUpdate): Promise<boolean> {
+      this.loading = true
+
+      const task = await $tvApi.tasks
+        .updateTask(data)
+        .catch(logError)
+        .finally(() => {
+          this.loading = false
+        })
+
+      if (!task) return false
+
+      const localTask = this.tasks.find(({ id }) => id === task.id)
+      if (localTask) {
+        Object.assign(localTask, task)
+      }
+      this.updateSelectedTask(task)
+
+      return true
+    },
+
+    //we do not fetch subtasks from server separately, we fetch all tasks with subtasks
+    // async fetchSubtasks(taskId: TaskItem['id']): Promise<void> {
+    //     this.loading = true;
+    //     const subtasks = await $tvApi.tasks.fetch(taskId).catch(logError).finally(() => this.loading = false);
+    //     // const result = await $api
+    //     //     .get<AppResponse<TaskItem[]>>(`${this.urls.fetchSubtasks}?taskId=${taskId}`)
+    //     //     .catch((err) => console.log(err));
+    //     // this.loading = false;
+    //     // if (result) {
+    //     //     if (result.data.response.length > 0) {
+    //     //         const task = this.tasks.find(({ id }) => id === +taskId);
+    //     //         if (task) {
+    //     //             task.subtasks = result.data.response;
+    //     //             this.updateSelectedTask(task);
+    //     //         } else {
+    //     //             if (this.selectedTask && +this.selectedTask.id === +taskId) {
+    //     //                 this.selectedTask.subtasks = result.data.response;
+    //     //             }
+    //     //         }
+    //     //     }
+    //     // }
+    // },
+
+    async toggleTagForTask(data: TagItemArgToggle) {
+      const tagsStore = useTagsStore()
+      const action = await tagsStore.toggleTag(data)
+
+      if (!action) {
+        return
+      }
+
+      const task = this.tasks.find((tsk) => +tsk.id === +data.taskId)
+
+      const toggleTag = (task: Task) => {
+        if (action === 'delete') {
+          const tagIndex = task.tags.indexOf(data.tagId)
+          if (tagIndex !== -1) {
+            task.tags.splice(tagIndex, 1)
+          }
+        } else {
+          task.tags.push(data.tagId)
+        }
+      }
+
+      if (task) {
+        toggleTag(task)
+        this.updateSelectedTask(task)
+      } else if (this.selectedTask?.id === data.taskId) {
+        toggleTag(this.selectedTask)
+      }
+
+    },
+
+    async udpatePriority(data: TaskArgUpdate): Promise<void> {
+      this.loading = true
+
+      const task = await $tvApi.tasks
+        .updateTask(data)
+        .catch(logError)
+        .finally(() => {
+          this.loading = false
+        })
+
+      if (!task) return
+
+      const localTask = this.tasks.find(({ id }) => id === task.id)
+
+      if (localTask) {
+        Object.assign(localTask, task)
+      }
+
+      this.updateSelectedTask(task)
+    },
+
+    //TODO fixme consider refactoring to make one method for all updates
+    async moveTaskToAnotherList(data: TaskArgUpdate) {
+      this.loading = true
+
+      const task = await $tvApi.tasks
+        .updateTask(data)
+        .catch(logError)
+        .finally(() => {
+          this.loading = false
+        })
+
+      if (!task) return
+
+      const localTask = this.tasks.find(({ id }) => id === task.id)
+
+      if (localTask) {
+        Object.assign(localTask, task)
+      }
+
+      this.updateSelectedTask(task)
+    },
+
+    async saveDateForTask(data: TaskArgUpdate) {
+      this.loading = true
+
+      const task = await $tvApi.tasks
+        .updateTask(data)
+        .catch(logError)
+        .finally(() => {
+          this.loading = false
+        })
+
+      if (!task) return
+
+      const localTask = this.tasks.find(({ id }) => id === task.id)
+
+      if (localTask) {
+        Object.assign(localTask, task)
+      }
+
+      this.updateSelectedTask(task)
+    },
+
+    async updateTaskAssignee(data: TaskArgToggleAssignee) {
+      this.loading = true
+
+      const updateAssignee = await $tvApi.tasks
+        .toggleTasksAssignee(data)
+        .catch(logError)
+        .finally(() => {
+          this.loading = false
+        })
+
+      if (!updateAssignee) return
+
+      const task = this.tasks.find((tsk) => tsk.id === data.taskId)
+
+      if (task) {
+        task.assignedUsers = updateAssignee.userIds
+        this.updateSelectedTask(task)
+      } else if (this.selectedTask?.id === data.taskId) {
+        this.selectedTask.assignedUsers = updateAssignee.userIds
+      }
+    },
+
+    // we do not fetch assigned users from server separately, we fetch all tasks with assigned users
+    // async fetchTaskAssignedUsers(data: Pick<TaskUpdateAssigneeArg, 'taskId'>) {
+    //     this.loading = true;
+    //     const result = await $api
+    //         .post<AppResponse<TaskUpdateAssigneeResp>>(this.urls.taskFetchAssignedUsers, data)
+    //         .catch((err) => console.log(err));
+    //     this.loading = false;
+
+    //     if (result) {
+    //         const task = this.tasks.find((tsk) => tsk.id === data.taskId);
+    //         if (task) {
+    //             task.assignedUsers = result.data.response.usersIds;
+    //             this.updateSelectedTask(task);
+    //         } else if (this.selectedTask?.id === data.taskId) {
+    //             this.selectedTask.assignedUsers = result.data.response.usersIds;
+    //         }
+    //     }
+    // },
+
+    async updateTaskStatusId(data: TaskArgUpdate) {
+      const task = await $tvApi.tasks
+        .updateTask(data)
+        .catch(logError)
+        .finally(() => {
+          this.loading = false
+        })
+
+      if (!task) return
+
+      const localTask = this.tasks.find(({ id }) => id === task.id)
+
+      if (localTask) {
+        Object.assign(localTask, task)
+        this.updateSelectedTask(task)
+      } else if (this.selectedTask?.id === task.id) {
+        Object.assign(this.selectedTask, task)
+      }
+    },
+
+    async updateTaskAmount(data: TaskArgUpdate) {
+      this.loading = true
+      const task = await $tvApi.tasks
+        .updateTask(data)
+        .catch(logError)
+        .finally(() => {
+          this.loading = false
+        })
+
+      if (!task) return
+
+      const localTask = this.tasks.find(({ id }) => id === task.id)
+
+      if (localTask) {
+        Object.assign(localTask, task)
+        this.updateSelectedTask(task)
+      } else if (this.selectedTask?.id === task.id) {
+        Object.assign(this.selectedTask, task)
+      }
+    },
+
+    async updateTaskTransactionType(data: TaskArgUpdate) {
+      this.loading = true
+      const task = await $tvApi.tasks
+        .updateTask(data)
+        .catch(logError)
+        .finally(() => {
+          this.loading = false
+        })
+
+      if (!task) return
+
+      const localTask = this.tasks.find(({ id }) => id === task.id)
+
+      if (localTask) {
+        Object.assign(localTask, task)
+        this.updateSelectedTask(task)
+      } else if (this.selectedTask?.id === task.id) {
+        Object.assign(this.selectedTask, task)
+      }
+    },
+
+    async updateTaskEstimate(data: TaskArgUpdate) {
+      this.loading = true
+      const task = await $tvApi.tasks
+        .updateTask(data)
+        .catch(logError)
+        .finally(() => {
+          this.loading = false
+        })
+
+      if (!task) return
+
+      const localTask = this.tasks.find(({ id }) => id === task.id)
+
+      if (localTask) {
+        Object.assign(localTask, task)
+        this.updateSelectedTask(task)
+      } else if (this.selectedTask?.id === task.id) {
+        Object.assign(this.selectedTask, task)
+      }
+    },
+
+    setLocalTaskRecurrence(data: { taskId: number; ruleId: number | null }) {
+      const localTask = this.tasks.find(({ id }) => id === data.taskId)
+      if (localTask) localTask.recurrenceRuleId = data.ruleId
+      if (this.selectedTask?.id === data.taskId) {
+        this.selectedTask.recurrenceRuleId = data.ruleId
+      }
+    },
+
+    async fetchRecurrenceForTask(taskId: number): Promise<RecurrenceRuleDetails | null> {
+      return await $tvApi.recurrence.getForTask(taskId).catch(() => null) ?? null
+    },
+
+    async createRecurrence(args: RecurrenceCreateArgs): Promise<RecurrenceRule | null> {
+      const rule = await $tvApi.recurrence.create(args).catch(logError)
+      if (!rule) return null
+      this.setLocalTaskRecurrence({ taskId: args.taskId, ruleId: rule.id })
+      return rule
+    },
+
+    async updateRecurrence(args: RecurrenceUpdateArgs): Promise<RecurrenceRule | null> {
+      return await $tvApi.recurrence.update(args).catch(logError) || null
+    },
+
+    async pauseRecurrence(ruleId: number): Promise<RecurrenceRule | null> {
+      return await $tvApi.recurrence.pause(ruleId).catch(logError) || null
+    },
+
+    async resumeRecurrence(ruleId: number): Promise<RecurrenceRule | null> {
+      return await $tvApi.recurrence.resume(ruleId).catch(logError) || null
+    },
+
+    /** The current occurrence is removed and the card jumps to the next date. */
+    async skipRecurrence(args: { ruleId: number; taskId: number }): Promise<RecurrenceRuleDetails | null> {
+      const details = await $tvApi.recurrence.skip(args.ruleId).catch(logError)
+      if (!details) return null
+
+      this.tasks = this.tasks.filter(({ id }) => id !== args.taskId)
+      if (details.openInstance) {
+        this.insertRecurrenceInstance(details.openInstance)
+        if (this.selectedTask?.id === args.taskId) {
+          this.selectedTask = details.openInstance
+        }
+      } else if (this.selectedTask?.id === args.taskId) {
+        this.selectedTask = null
+      }
+      return details
+    },
+
+    async deleteRecurrence(args: { ruleId: number; taskId: number }): Promise<boolean> {
+      const result = await $tvApi.recurrence.remove(args.ruleId).catch(logError)
+      if (!result) return false
+      this.setLocalTaskRecurrence({ taskId: args.taskId, ruleId: null })
+      return true
+    },
+
+    async handleRecurrenceInstanceCreated(data: { goalId: number; taskId: number }) {
+      if (Number(this.fetchRules.goalId) !== data.goalId) return
+      if (this.tasks.some(({ id }) => id === data.taskId)) return
+      const task = await $tvApi.tasks.fetchTaskById(data.taskId).catch(() => null)
+      if (!task) return
+      this.insertRecurrenceInstance(task)
+    },
+
+    insertRecurrenceInstance(task: Task) {
+      if (this.tasks.some(({ id }) => id === task.id)) return
+      if (Number(this.fetchRules.goalId) !== task.goalId) return
+      // Normalize to the client Task shape in case relations are missing.
+      this.tasks.unshift({
+        ...task,
+        tags: task.tags ?? [],
+        assignedUsers: task.assignedUsers ?? [],
+        subtasks: task.subtasks ?? [],
+        historyId: task.historyId ?? null,
+      })
+    },
+  },
+})

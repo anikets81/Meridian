@@ -1,0 +1,27 @@
+import { boolean, integer, pgSchema, timestamp, varchar } from "drizzle-orm/pg-core";
+import { UsersSchema } from "./users.schema";
+import { OrganizationsSchema } from "./organizations.schema";
+// import { createInsertSchema, createSelectSchema } from "drizzle-arktype";
+// we use this schema only for the database operations
+export const GoalsSchema = pgSchema('tasks').table('goals', {
+    id: integer().primaryKey().generatedAlwaysAsIdentity(),
+    name: varchar(),
+    description: varchar(),
+    color: varchar(),
+    dateCreation: timestamp('date_creation').defaultNow(),
+    owner: integer().notNull().references(() => UsersSchema.id, { onDelete: 'cascade' }),
+    creatorId: integer('creator_id').references(() => UsersSchema.id, { onDelete: 'set null' }),
+    editDate: timestamp('edit_date'),
+    archive: integer().notNull().default(0),
+    backlogVersion: integer('backlog_version').default(1),
+    organizationId: integer('organization_id').references(() => OrganizationsSchema.id, { onDelete: 'cascade' }),
+    estimateUnit: varchar('estimate_unit', { length: 10 }).$type<'hours' | 'points'>().notNull().default('points'),
+    isInbox: boolean('is_inbox').notNull().default(false),
+});
+
+export type GoalsSchemaTypeForSelect = typeof GoalsSchema.$inferSelect;
+export type GoalsSchemaTypeForInsert = typeof GoalsSchema.$inferInsert;
+
+// export const GoalsSchemaArkTypeInsert = createInsertSchema(GoalsSchema);
+// export const GoalsSchemaArkTypeSelect = createSelectSchema(GoalsSchema);
+

@@ -1,0 +1,38 @@
+import { Router } from 'express'
+import type { Routable } from '../../types/routable.type'
+import { IsLoggedIn } from '../auth/middlewares/is-logged-in'
+import { IsOrgAdmin } from '../organizations/middlewares/IsOrgAdmin'
+import { IsSsoConfigAdmin } from './middlewares/IsSsoConfigAdmin'
+import { RequireLoginMethod } from '../auth/middlewares/require-login-method'
+import { SsoController } from './SsoController'
+
+export default class SsoRoutes implements Routable {
+  private readonly router: ReturnType<typeof Router>
+  private readonly controller: SsoController
+
+  constructor() {
+    this.router = Router()
+    this.controller = new SsoController()
+    this.initRoutes()
+  }
+
+  getRouter() {
+    return this.router
+  }
+
+  initRoutes() {
+    this.router.get('/providers', [RequireLoginMethod('sso')], this.controller.listPublicProviders)
+    this.router.get('/login/:configId', [RequireLoginMethod('sso')], this.controller.initiateLogin)
+    this.router.get('/callback/:configId', [RequireLoginMethod('sso')], this.controller.handleCallback)
+    this.router.post('/callback/:configId', [RequireLoginMethod('sso')], this.controller.handleCallback)
+
+    this.router.get('/admin/public-urls', [IsLoggedIn], this.controller.getPublicUrls)
+    this.router.get('/admin/metadata', [IsLoggedIn, IsOrgAdmin], this.controller.parseMetadata)
+    this.router.get('/admin/configs', [IsLoggedIn, IsOrgAdmin], this.controller.listConfigs)
+    this.router.post('/admin/configs', [IsLoggedIn, IsOrgAdmin], this.controller.createConfig)
+    this.router.patch('/admin/configs/:configId', [IsLoggedIn, IsSsoConfigAdmin], this.controller.updateConfig)
+    this.router.delete('/admin/configs/:configId', [IsLoggedIn, IsSsoConfigAdmin], this.controller.deleteConfig)
+    this.router.post('/admin/configs/:configId/scim-token', [IsLoggedIn, IsSsoConfigAdmin], this.controller.generateScimToken)
+    this.router.patch('/admin/configs/:configId/scim', [IsLoggedIn, IsSsoConfigAdmin], this.controller.toggleScim)
+  }
+}
