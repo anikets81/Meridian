@@ -218,8 +218,9 @@ You must **redeploy Vercel** after changing these (they are applied at build tim
 | `conflicting paths or names` | Root Directory must be `web` (not `.`); see Step 3 |
 | Vercel build exits with code 1/2 | Clear any **custom Build Command** override in Vercel settings; redeploy latest commit; set Node.js to **24.x** |
 | Vercel build fails on `pnpm` | Check `vercel.json` install command; ensure repo has `pnpm-lock.yaml` |
-| Login fails / network error | Confirm `TASKVIEW_API_URL` on Vercel matches Render API URL |
-| CORS error in browser console | Add exact Vercel URL to `CORS_ALLOWED_ORIGINS` on Render (include `https://`) |
+| Login fails / network error | Confirm `TASKVIEW_API_URL` on Vercel matches Render API URL; set Render `APP_URL` + `CORS_ALLOWED_ORIGINS` to your Vercel URL (or use `CORS_ALLOW_VERCEL=true` from blueprint) |
+| CORS error in browser console | Add exact Vercel URL to `CORS_ALLOWED_ORIGINS` on Render, or redeploy with `CORS_ALLOW_VERCEL=true` |
+| API URL in browser shows 404/blank | Normal for `/` on older deploys — use `/health` to test; open your **Vercel** URL for the app |
 | API slow first request | Render free tier cold start — wait ~60s or upgrade plan |
 | Render build fails | Check **Logs**; ensure Dockerfile path is `deploy/render-vercel/Dockerfile.api` |
 | Health check timeout | Redeploy after latest fix; confirm `/health` returns 200 in logs; set `APP_URL` if needed |

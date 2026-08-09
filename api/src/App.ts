@@ -25,6 +25,16 @@ export default class App {
             res.status(200).json({ ok: true });
         });
 
+        this.app.get('/', (_req, res) => {
+            res.status(200).json({
+                service: 'Meridian API',
+                ok: true,
+                health: '/health',
+                auth: '/module/auth/login-options',
+                note: 'This is the backend API. Open your Vercel frontend URL in the browser, not this URL.',
+            });
+        });
+
         this.extendApp();
 
         this.initializeMiddlewares();
