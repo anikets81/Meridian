@@ -8,15 +8,17 @@ const allow = new Set([
         'capacitor://app.taskview.tech',
         'https://appleid.apple.com',
     ]),
-    ...(process.env.CORS_ALLOWED_ORIGINS?.split(',') || []),
+    ...(process.env.CORS_ALLOWED_ORIGINS?.split(',').map((origin) => origin.trim()).filter(Boolean) || []),
 ]);
+
+const allowAllOrigins = allow.has('*');
 
 export const corsMiddleware = cors({
     credentials: true,
     maxAge: 600,
     origin(origin, cb) {
         if (!origin || origin === 'null') return cb(null, true);
-        if (allow.has(origin)) return cb(null, true);
+        if (allowAllOrigins || allow.has(origin)) return cb(null, true);
         return cb(new Error(`CORS blocked origin: ${origin}`), false);
     },
 });

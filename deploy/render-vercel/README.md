@@ -123,6 +123,8 @@ The API must allow requests from your Vercel domain.
    | `API_URL` | `https://meridian-api.onrender.com` |
    | `API_PUBLIC_URL` | `https://meridian-api.onrender.com` |
 
+   On first deploy, `APP_URL` is auto-set from `RENDER_EXTERNAL_URL` so the service can start. Update `APP_URL` and `CORS_ALLOWED_ORIGINS` once Vercel is live.
+
    See [`.env.render.example`](./.env.render.example) for a template.
 
 3. Click **Save Changes** — Render redeploys the API automatically.
@@ -198,6 +200,7 @@ You must also seed the demo user against your Render database (run [`seed-local.
 | CORS error in browser console | Add exact Vercel URL to `CORS_ALLOWED_ORIGINS` on Render (include `https://`) |
 | API slow first request | Render free tier cold start — wait ~60s or upgrade plan |
 | Render build fails | Check **Logs**; ensure Dockerfile path is `deploy/render-vercel/Dockerfile.api` |
+| Health check timeout | Redeploy after latest fix; confirm `/health` returns 200 in logs; set `APP_URL` if needed |
 | Empty app after login | Migrations failed — check **meridian-api** logs for Postgres errors |
 | `Invalid environment variables` | Ensure all four URL env vars are set on Render after Vercel deploy |
 

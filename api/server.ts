@@ -14,7 +14,9 @@ if (!valid.success) {
     throw new Error('Invalid environment variables');
 }
 
-const app = new App((process.env.APP_PORT as unknown as number) || 1401);
+const port = Number(process.env.APP_PORT || process.env.PORT) || 1401;
+
+const app = new App(port);
 
 app.listen();
 

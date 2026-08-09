@@ -21,6 +21,10 @@ export default class App {
         this.app = express();
         this.port = port;
 
+        this.app.get('/health', (_req, res) => {
+            res.status(200).json({ ok: true });
+        });
+
         this.extendApp();
 
         this.initializeMiddlewares();
