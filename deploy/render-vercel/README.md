@@ -186,13 +186,27 @@ This ensures `config.js` is built with the correct `TASKVIEW_API_URL`.
 
 The login page shows a **Try the demo** panel when `config.js` includes demo credentials (set at Vercel build time via `vercel.json`).
 
-| Login | Password |
-|-------|----------|
-| `visitor` | `visitor!!` |
+| Login | Password | What you get |
+|-------|----------|--------------|
+| `visitor` | `visitor!!` | **Demo workspace** — sample projects, tasks, kanban, sprints |
+| `user` | `user1!#Q` | Empty default admin account (no sample data) |
 
-On Render, the API auto-creates the `visitor` account on startup (`SEED_DEMO_USER=true` in `render.yaml`).
+**Important:** Use **`visitor`**, not `user`, to explore pre-loaded demo content.
 
-To load **sample projects and tasks** (not just an empty account), run the full seed against your Render API from your machine — see [`deploy/visitor-demo/README.md`](../visitor-demo/README.md).
+On Render, the API auto-creates the `visitor` account and (after redeploy with `SEED_DEMO_DATA=true`) loads sample data on startup.
+
+### Seed demo data now (without waiting for redeploy)
+
+From your machine, with Render **External Database** credentials:
+
+```powershell
+cd deploy\render-vercel
+.\seed-render.ps1 -DbHost "YOUR_RENDER_DB_HOST" -DbPassword "YOUR_DB_PASSWORD"
+```
+
+Host/password: Render Dashboard → **meridian-db** → **Connect** → **External Connection**.
+
+Then sign in on Vercel as **`visitor`** / **`visitor!!`**.
 
 ---
 
@@ -228,6 +242,7 @@ You must **redeploy Vercel** after changing these (they are applied at build tim
 | `Invalid environment variables` | Ensure all four URL env vars are set on Render after Vercel deploy |
 | No **Try the demo** button on login | Redeploy Vercel (demo creds are baked into `config.js` at build time) |
 | Demo button shows but login fails | Redeploy Render API (creates `visitor` on startup) or register `visitor` manually |
+| Logged in but no projects/tasks | You are likely on **`user`** admin — use **`visitor`** / **`visitor!!`**, or run `deploy/render-vercel/seed-render.ps1` |
 
 ---
 

@@ -38,7 +38,10 @@ RUN npm install --omit=dev
 COPY --from=builder /app/api/dist-migration /app-migration
 COPY deploy/render-vercel/docker-entrypoint.sh /entrypoint.sh
 COPY deploy/render-vercel/ensure-demo-user.mjs /ensure-demo-user.mjs
-RUN chmod +x /entrypoint.sh
+COPY deploy/visitor-demo/seed/seed-demo.ts /demo-seed/seed-demo.ts
+COPY deploy/visitor-demo/seed/package.json /demo-seed/package.json
+RUN chmod +x /entrypoint.sh \
+  && cd /demo-seed && npm install --omit=dev && cd /usr/src/app
 
 ENV NODE_ENV=production
 ENV PM2_INSTANCES=1

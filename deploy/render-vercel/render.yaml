@@ -58,6 +58,8 @@ services:
         value: password
       - key: SEED_DEMO_USER
         value: "true"
+      - key: SEED_DEMO_DATA
+        value: "true"
       - key: DEMO_LOGIN
         value: visitor
       - key: DEMO_PASSWORD

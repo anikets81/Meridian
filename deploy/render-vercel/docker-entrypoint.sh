@@ -77,6 +77,21 @@ if [ "${SEED_DEMO_USER:-true}" != "false" ]; then
       DEMO_EMAIL="${DEMO_EMAIL:-visitor@demo.taskview.local}" \
       SEED_DEMO_USER="${SEED_DEMO_USER:-true}" \
       node /ensure-demo-user.mjs || true
+
+    if [ "${SEED_DEMO_DATA:-true}" != "false" ]; then
+      echo "Seeding demo workspace (projects, tasks, kanban)..."
+      API_URL="http://127.0.0.1:${APP_PORT}" \
+        DB_HOST="$DB_HOST" \
+        DB_USER="$DB_USER" \
+        DB_PASSWORD="$DB_PASSWORD" \
+        DB_NAME="$DB_NAME" \
+        DB_PORT="$DB_PORT" \
+        DEMO_LOGIN="${DEMO_LOGIN:-visitor}" \
+        DEMO_PASSWORD="${DEMO_PASSWORD:-visitor!!}" \
+        DEMO_EMAIL="${DEMO_EMAIL:-visitor@demo.taskview.local}" \
+        node --experimental-strip-types /demo-seed/seed-demo.ts \
+        || echo "Demo data seed failed — run deploy/render-vercel/seed-render.ps1 manually"
+    fi
   ) &
 fi
 
