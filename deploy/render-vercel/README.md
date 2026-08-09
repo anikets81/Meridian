@@ -90,6 +90,7 @@ Render creates:
    | **Framework Preset** | Other |
    | **Root Directory** | `web` |
    | **Include source files outside Root Directory** | **Enabled** (required for pnpm workspace) |
+   | **Node.js Version** | `24.x` (Settings → General → Node.js Version) |
    | **Build Command** | *(auto from `web/vercel.json`)* |
    | **Output Directory** | `dist` |
 
@@ -200,6 +201,7 @@ You must also seed the demo user against your Render database (run [`seed-local.
 |---------|-----|
 | `Missing script: build:webapp` | Set **Root Directory** to `web`, enable **Include source files outside Root Directory**, redeploy |
 | `conflicting paths or names` | Root Directory must be `web` (not `.`); see Step 3 |
+| Vercel build exits with code 1/2 | Set Node.js to **24.x**; ensure latest `build:vercel` script is deployed; redeploy |
 | Vercel build fails on `pnpm` | Check `vercel.json` install command; ensure repo has `pnpm-lock.yaml` |
 | Login fails / network error | Confirm `TASKVIEW_API_URL` on Vercel matches Render API URL |
 | CORS error in browser console | Add exact Vercel URL to `CORS_ALLOWED_ORIGINS` on Render (include `https://`) |
