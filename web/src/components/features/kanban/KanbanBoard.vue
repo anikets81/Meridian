@@ -2,7 +2,7 @@
   <div
     v-if="canViewKanban"
     ref="kanbanContainer"
-    class="flex gap-2 h-full"
+    class="flex gap-2 h-full min-h-0 overflow-x-auto overflow-y-hidden p-2 sm:px-4"
     @pointermove="handlePointerMove"
     @pointerleave="boardStopScrolling"
     @pointerdown="pointerDownHandler"
@@ -11,7 +11,7 @@
     <div
       v-for="status in kanbanStore.statuses"
       :key="status.id"
-      class="h-full max-w-[340px] min-w-[272px] shadow-lg gap-2 flex flex-col w-[91.666667%] rounded-lg"
+      class="shrink-0 flex flex-col h-full min-h-0 w-[85vw] max-w-[340px] min-w-[272px] sm:w-80 lg:w-72 rounded-lg shadow-lg"
     >
       <div class="bg-elevated rounded-lg p-2 px-3 flex items-center text-base h-10 rounded-b-none">
         <span class="grow truncate">
@@ -35,7 +35,7 @@
         :list="kanbanStore.tasksData[status.id]?.tasks"
         :data-column-id="status.id"
         :animation="150"
-        class="flex gap-2 p-2 h-full flex-col overflow-auto overflow-x-hidden"
+        class="flex gap-2 p-2 min-h-0 flex-1 flex-col overflow-y-auto overflow-x-hidden"
         item-key="id"
         group="kanban-tasks"
         @start="startHandler"
@@ -49,7 +49,7 @@
           >
             <TaskItem
               :task="element"
-              :ui="{ additionalInfo: 'flex-col items-stretch flex-nowrap' }"
+              hide-project-name
               @toggle="updateTaskChecked"
             />
           </div>

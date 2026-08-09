@@ -1,5 +1,5 @@
 <template>
-  <div class="tv-kanban__col">
+  <div class="shrink-0 flex flex-col h-full min-h-0 w-[85vw] max-w-[340px] min-w-[272px] sm:w-80 lg:w-72">
     <div class="w-full flex flex-col gap-3">
       <UInput
         v-model="statusName"
@@ -7,7 +7,7 @@
         icon="i-lucide-plus"
         size="xl"
         variant="soft"
-        class="h-full max-w-[340px] min-w-[272px] flex flex-col w-[91.666667%] rounded-lg"
+        class="w-full max-w-[340px] min-w-[272px]"
       />
 
       <UButton

@@ -50,7 +50,9 @@
     </template>
 
     <template #body>
-      <KanbanBoard />
+      <div class="relative h-full min-h-0 overflow-hidden">
+        <KanbanBoard />
+      </div>
     </template>
   </UDashboardPanel>
   <TvTaskDetailOverlay />

@@ -37,11 +37,11 @@ export const useKanbanStore = defineStore('kanban', {
         }
       }
 
-      // if (cursor === null) {
-      //   this.tasksData[columnId ?? DEFAULT_ID]!.tasks = result.tasks
-      // } else {
-      this.tasksData[columnId ?? DEFAULT_ID]!.tasks.push(...result.tasks)
-      // }
+      if (cursor === null) {
+        this.tasksData[columnId ?? DEFAULT_ID]!.tasks = result.tasks
+      } else {
+        this.tasksData[columnId ?? DEFAULT_ID]!.tasks.push(...result.tasks)
+      }
       this.tasksData[columnId ?? DEFAULT_ID]!.nextCursor = result.nextCursor
       this.tasksData[columnId ?? DEFAULT_ID]!.columnVersion = result.columnVersion
     },
@@ -98,13 +98,15 @@ export const useKanbanStore = defineStore('kanban', {
       if (!result) {
         return
       }
-      this.statuses = result
-      this.statuses.unshift({
-        id: DEFAULT_ID,
-        name: 'msg.allTasks',
-        goalId: this.goalId,
-        viewOrder: 0,
-      })
+      this.statuses = [
+        {
+          id: DEFAULT_ID,
+          name: 'msg.allTasks',
+          goalId: this.goalId,
+          viewOrder: 0,
+        },
+        ...result,
+      ]
     },
 
     async addStatus(data: KanbanArgAddColumn) {

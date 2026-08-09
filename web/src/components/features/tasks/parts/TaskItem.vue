@@ -59,7 +59,7 @@
           
           <!-- Project -->
           <UBadge
-            v-if="projectName"
+            v-if="projectName && !hideProjectName"
             :label="projectName"
             icon="i-lucide-folder"
             color="neutral"
@@ -142,6 +142,7 @@ import { useTaskDetailPanel } from '@/composables/useTaskDetailPanel'
 const TOGGLE_DELAY = 200
 const props = defineProps<{
   task: Task
+  hideProjectName?: boolean
   ui?: {
     additionalInfo?: string
   }
@@ -260,7 +261,7 @@ const transactionColor = computed(() => {
 })
 
 const hasAdditionalInfo = computed(() => {
-  return projectName.value ||
+  return (projectName.value && !props.hideProjectName) ||
     listName.value ||
     props.task.endDate ||
     props.task.amount ||
