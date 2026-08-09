@@ -54,4 +54,30 @@ trap cleanup EXIT
 
 echo "Starting API on port ${APP_PORT}..."
 cd /usr/src/app
-exec pm2-runtime start ecosystem.config.js --env production
+
+pm2-runtime start ecosystem.config.js --env production &
+PM2_PID=$!
+
+if [ "${SEED_DEMO_USER:-true}" != "false" ]; then
+  (
+    echo "Waiting for API before demo user seed..."
+    tries=0
+    max_tries=90
+    until curl -sf "http://127.0.0.1:${APP_PORT}/health" >/dev/null 2>&1; do
+      tries=$((tries + 1))
+      if [ "$tries" -ge "$max_tries" ]; then
+        echo "Demo user seed skipped — API health check timed out"
+        exit 0
+      fi
+      sleep 2
+    done
+    DEMO_SEED_API_URL="http://127.0.0.1:${APP_PORT}" \
+      DEMO_LOGIN="${DEMO_LOGIN:-visitor}" \
+      DEMO_PASSWORD="${DEMO_PASSWORD:-visitor!!}" \
+      DEMO_EMAIL="${DEMO_EMAIL:-visitor@demo.taskview.local}" \
+      SEED_DEMO_USER="${SEED_DEMO_USER:-true}" \
+      node /ensure-demo-user.mjs || true
+  ) &
+fi
+
+wait "$PM2_PID"

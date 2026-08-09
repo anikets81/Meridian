@@ -182,16 +182,31 @@ This ensures `config.js` is built with the correct `TASKVIEW_API_URL`.
 
 ---
 
-## Demo mode on Vercel (optional)
+## Demo visitor login
 
-To show the **visitor** demo login button, add Vercel env vars:
+The login page shows a **Try the demo** panel when `config.js` includes demo credentials (set at Vercel build time via `vercel.json`).
 
-| Name | Value |
-|------|--------|
+| Login | Password |
+|-------|----------|
+| `visitor` | `visitor!!` |
+
+On Render, the API auto-creates the `visitor` account on startup (`SEED_DEMO_USER=true` in `render.yaml`).
+
+To load **sample projects and tasks** (not just an empty account), run the full seed against your Render API from your machine — see [`deploy/visitor-demo/README.md`](../visitor-demo/README.md).
+
+---
+
+## Demo mode on Vercel (optional overrides)
+
+Default demo env vars are baked into root `vercel.json`. To change them, override in Vercel → **Environment Variables** and redeploy:
+
+| Name | Default |
+|------|---------|
 | `TASKVIEW_DEMO_LOGIN` | `visitor` |
 | `TASKVIEW_DEMO_PASSWORD` | `visitor!!` |
+| `TASKVIEW_DEMO_HIDE_REGISTRATION` | `true` |
 
-You must also seed the demo user against your Render database (run [`seed-local.ps1`](../visitor-demo/seed-local.ps1) pointed at Render Postgres **external** connection — advanced; not recommended for production).
+You must **redeploy Vercel** after changing these (they are applied at build time when `config.js` is generated).
 
 ---
 
@@ -210,6 +225,8 @@ You must also seed the demo user against your Render database (run [`seed-local.
 | Health check timeout | Redeploy after latest fix; confirm `/health` returns 200 in logs; set `APP_URL` if needed |
 | Empty app after login | Migrations failed — check **meridian-api** logs for Postgres errors |
 | `Invalid environment variables` | Ensure all four URL env vars are set on Render after Vercel deploy |
+| No **Try the demo** button on login | Redeploy Vercel (demo creds are baked into `config.js` at build time) |
+| Demo button shows but login fails | Redeploy Render API (creates `visitor` on startup) or register `visitor` manually |
 
 ---
 

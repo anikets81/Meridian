@@ -4,6 +4,13 @@
   "installCommand": "corepack enable && corepack prepare pnpm@10.28.1 --activate && PNPM_CONFIG_ENGINE_STRICT=false pnpm install --config.engine-strict=false",
   "buildCommand": "node scripts/build-vercel.mjs",
   "outputDirectory": "web/dist",
+  "build": {
+    "env": {
+      "TASKVIEW_DEMO_LOGIN": "visitor",
+      "TASKVIEW_DEMO_PASSWORD": "visitor!!",
+      "TASKVIEW_DEMO_HIDE_REGISTRATION": "true"
+    }
+  },
   "rewrites": [
     { "source": "/(.*)", "destination": "/index.html" }
   ]
