@@ -1,4 +1,5 @@
-# Frontend-only deploy — exclude backend and legacy sources from Vercel output.
-api/
-deploy/
-web__old/
+# Frontend-only deploy — exclude backend and legacy sources from Vercel upload.
+# Leading slash anchors patterns to repo root (unanchored "api/" also excludes taskview-api/src/api/).
+/api/
+/deploy/
+/web__old/
