@@ -88,11 +88,12 @@ Render creates:
    | Setting | Value |
    |---------|--------|
    | **Framework Preset** | Other |
-   | **Root Directory** | `.` (repository root — **not** `web`) |
-   | **Build Command** | *(auto from `vercel.json`)* `pnpm --filter web-nuxt-ui... run build` |
-   | **Output Directory** | `web/dist` |
+   | **Root Directory** | `web` |
+   | **Include source files outside Root Directory** | **Enabled** (required for pnpm workspace) |
+   | **Build Command** | *(auto from `web/vercel.json`)* |
+   | **Output Directory** | `dist` |
 
-   > If Vercel auto-detected `web` as the root directory, change it back to `.` under **Settings → General → Root Directory**. The monorepo needs workspace packages from the repo root.
+   > Do **not** set Root Directory to `.` — Vercel rejects the monorepo because `api/` and `web__old/` contain same-basename files (e.g. `.ts` + `.html`). The `web/vercel.json` installs and builds from the repo root automatically.
 
 5. Add **Environment Variable**:
 
@@ -197,7 +198,8 @@ You must also seed the demo user against your Render database (run [`seed-local.
 
 | Problem | Fix |
 |---------|-----|
-| `Missing script: build:webapp` | Set **Root Directory** to `.` (repo root), not `web`; redeploy |
+| `Missing script: build:webapp` | Set **Root Directory** to `web`, enable **Include source files outside Root Directory**, redeploy |
+| `conflicting paths or names` | Root Directory must be `web` (not `.`); see Step 3 |
 | Vercel build fails on `pnpm` | Check `vercel.json` install command; ensure repo has `pnpm-lock.yaml` |
 | Login fails / network error | Confirm `TASKVIEW_API_URL` on Vercel matches Render API URL |
 | CORS error in browser console | Add exact Vercel URL to `CORS_ALLOWED_ORIGINS` on Render (include `https://`) |

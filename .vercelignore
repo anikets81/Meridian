@@ -1,0 +1,4 @@
+# Frontend-only deploy — exclude backend and legacy sources from Vercel output.
+api/
+deploy/
+web__old/
