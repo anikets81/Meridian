@@ -85,16 +85,16 @@ Render creates:
 3. Import the **same GitHub repository**
 4. Configure the project:
 
-   | Setting | Value |
-   |---------|--------|
-   | **Framework Preset** | Other |
-   | **Root Directory** | `web` (or `.` — both work with current `vercel.json`) |
-   | **Include source files outside Root Directory** | **Enabled** when Root Directory is `web` |
-   | **Node.js Version** | `24.x` (Settings → General — or leave on Automatic; root `package.json` requests 24.x) |
-   | **Build Command** | Leave empty / default — uses `node web/scripts/build-vercel.mjs` from `vercel.json` |
-   | **Output Directory** | `dist` when Root Directory is `web`; `web/dist` when Root Directory is `.` |
+   | Setting | Root Directory = `.` | Root Directory = `web` |
+   |---------|----------------------|-------------------------|
+   | **Root Directory** | `.` | `web` |
+   | **Include source files outside Root Directory** | — | **Enabled** |
+   | **Node.js Version** | `24.x` | `24.x` |
+   | **Build Command** | `node scripts/build-vercel.mjs` | `cd .. && node scripts/build-vercel.mjs` |
+   | **Output Directory** | `web/dist` | `dist` |
+   | **Install Command** | *(from root `vercel.json`)* | *(from `web/vercel.json` — starts with `cd ..`)* |
 
-   > Do **not** set Root Directory to `.` — Vercel rejects the monorepo because `api/` and `web__old/` contain same-basename files (e.g. `.ts` + `.html`). The `web/vercel.json` installs and builds from the repo root automatically.
+   > **Common mistake:** Root Directory = `web` but Build Command = `node web/scripts/build-vercel.mjs` — that path does not exist and exits with code **1**. Either turn overrides **off** and redeploy, or match the table above exactly.
 
 5. Add **Environment Variable**:
 
