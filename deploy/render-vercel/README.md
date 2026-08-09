@@ -88,11 +88,11 @@ Render creates:
    | Setting | Value |
    |---------|--------|
    | **Framework Preset** | Other |
-   | **Root Directory** | `web` |
-   | **Include source files outside Root Directory** | **Enabled** (required for pnpm workspace) |
-   | **Node.js Version** | `24.x` (Settings → General → Node.js Version) |
-   | **Build Command** | *(auto from `web/vercel.json`)* |
-   | **Output Directory** | `dist` |
+   | **Root Directory** | `web` (or `.` — both work with current `vercel.json`) |
+   | **Include source files outside Root Directory** | **Enabled** when Root Directory is `web` |
+   | **Node.js Version** | `24.x` (Settings → General — or leave on Automatic; root `package.json` requests 24.x) |
+   | **Build Command** | Leave empty / default — uses `node web/scripts/build-vercel.mjs` from `vercel.json` |
+   | **Output Directory** | `dist` when Root Directory is `web`; `web/dist` when Root Directory is `.` |
 
    > Do **not** set Root Directory to `.` — Vercel rejects the monorepo because `api/` and `web__old/` contain same-basename files (e.g. `.ts` + `.html`). The `web/vercel.json` installs and builds from the repo root automatically.
 
@@ -201,7 +201,7 @@ You must also seed the demo user against your Render database (run [`seed-local.
 |---------|-----|
 | `Missing script: build:webapp` | Set **Root Directory** to `web`, enable **Include source files outside Root Directory**, redeploy |
 | `conflicting paths or names` | Root Directory must be `web` (not `.`); see Step 3 |
-| Vercel build exits with code 1/2 | Set Node.js to **24.x**; ensure latest `build:vercel` script is deployed; redeploy |
+| Vercel build exits with code 1/2 | Clear any **custom Build Command** override in Vercel settings; redeploy latest commit; set Node.js to **24.x** |
 | Vercel build fails on `pnpm` | Check `vercel.json` install command; ensure repo has `pnpm-lock.yaml` |
 | Login fails / network error | Confirm `TASKVIEW_API_URL` on Vercel matches Render API URL |
 | CORS error in browser console | Add exact Vercel URL to `CORS_ALLOWED_ORIGINS` on Render (include `https://`) |
