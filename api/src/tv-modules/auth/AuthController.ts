@@ -884,7 +884,7 @@ export default class AuthController {
 
         const sendResult = await Email.send({
             text: code,
-            to: userEmail, //'gimanhead@gmail.com',
+            to: userEmail,
             subject: 'Account deletion code!',
             from: process.env.SMTP_FROM_EMAIL as string,
         });

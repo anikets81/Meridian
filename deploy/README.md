@@ -1,4 +1,4 @@
-# TaskView deployment packages
+# Meridian deployment packages
 
 Two ready-to-run folders for different audiences:
 

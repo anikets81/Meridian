@@ -113,10 +113,10 @@ TASKVIEW_URL=http://localhost:3000 TASKVIEW_TOKEN=tvk_... node dist/index.js
 
 ## License
 
-See [LICENSE.md](https://github.com/Gimanh/taskview-community/blob/main/LICENSE.md) in the TaskView repository.
+See [LICENSE.md](https://github.com/anikets81/Meridian/blob/main/LICENSE.md) in the Meridian repository.
 
 ## Links
 
-- [TaskView](https://github.com/Gimanh/taskview-community) — project repository
+- [Meridian](https://github.com/anikets81/Meridian) — project repository
 - [Model Context Protocol](https://modelcontextprotocol.io) — protocol specification
-- [Issues](https://github.com/Gimanh/taskview-community/issues) — bug reports & feature requests
+- [Issues](https://github.com/anikets81/Meridian/issues) — bug reports & feature requests

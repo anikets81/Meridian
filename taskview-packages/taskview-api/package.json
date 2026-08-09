@@ -5,12 +5,12 @@
   "type": "module",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/Gimanh/taskview-community.git",
+    "url": "git+https://github.com/anikets81/Meridian.git",
     "directory": "taskview-packages/taskview-api"
   },
-  "homepage": "https://github.com/Gimanh/taskview-community/tree/main/taskview-packages/taskview-api#readme",
+  "homepage": "https://github.com/anikets81/Meridian/tree/main/taskview-packages/taskview-api#readme",
   "bugs": {
-    "url": "https://github.com/Gimanh/taskview-community/issues"
+    "url": "https://github.com/anikets81/Meridian/issues"
   },
   "main": "./dist/taskview-api.umd.js",
   "module": "./dist/taskview-api.es.js",

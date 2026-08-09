@@ -1,10 +1,10 @@
 {
   "name": "taskview",
-  "displayName": "TaskView",
+  "displayName": "Meridian",
   "version": "0.1.0",
-  "description": "Manage TaskView projects and tasks from Claude Code — browse projects, view and create tasks, and log your work without leaving the terminal. Bundles the TaskView MCP server.",
+  "description": "Manage Meridian projects and tasks from Claude Code — browse projects, view and create tasks, and log your work without leaving the terminal.",
   "author": {
-    "name": "Nikolai Giman"
+    "name": "Meridian"
   },
   "userConfig": {
     "taskview_url": {

@@ -1,13 +1,13 @@
 {
-  "name": "taskview",
+  "name": "meridian",
   "owner": {
-    "name": "Nikolai Giman"
+    "name": "Meridian"
   },
   "plugins": [
     {
       "name": "taskview",
       "source": "./taskview-plugin",
-      "description": "Manage TaskView projects and tasks from Claude Code. Bundles the TaskView MCP server, skills, and slash commands."
+      "description": "Manage Meridian projects and tasks from Claude Code. Bundles the MCP server, skills, and slash commands."
     }
   ]
 }

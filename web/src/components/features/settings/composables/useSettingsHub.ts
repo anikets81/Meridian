@@ -127,8 +127,7 @@ export function useSettingsHub() {
       items: [
         { kind: 'nav', key: 'site', icon: 'i-lucide-globe', color: 'zinc', title: t('userMenu.site'), href: 'https://taskview.tech/' },
         { kind: 'nav', key: 'docs', icon: 'i-lucide-book-open', color: 'zinc', title: t('userMenu.documentation'), href: 'https://taskview.tech/docs/' },
-        { kind: 'nav', key: 'github', icon: 'simple-icons:github', color: 'zinc', title: t('userMenu.github'), href: 'https://github.com/Gimanh/taskview-community' },
-        { kind: 'nav', key: 'docker', icon: 'simple-icons:docker', color: 'zinc', title: t('userMenu.docker'), href: 'https://hub.docker.com/u/gimanhead' },
+        { kind: 'nav', key: 'github', icon: 'simple-icons:github', color: 'zinc', title: t('userMenu.github'), href: 'https://github.com/anikets81/Meridian' },
       ],
     }
 

@@ -122,5 +122,5 @@ For commercial licensing inquiries, contact:
 
 --- 
 
-Copyright (c) 2026 Nikolai Giman
+Copyright (c) 2026 Meridian
 All rights reserved.

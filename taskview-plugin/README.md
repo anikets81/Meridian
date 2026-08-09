@@ -20,7 +20,7 @@ Browse and manage your [TaskView](https://taskview.tech) projects and tasks dire
 ## Install
 
 ```text
-/plugin marketplace add Gimanh/taskview-community
+/plugin marketplace add anikets81/Meridian
 /plugin install taskview@taskview
 ```
 

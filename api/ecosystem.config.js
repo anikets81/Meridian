@@ -1,4 +1,3 @@
-// https://github.com/Gimanh/taskview-community/issues/88
 // GH-88: one worker per core ('max') multiplied by the per-worker DB pool
 // (DB_POOL_MAX, default 20) exhausts Postgres max_connections (default 100)
 // on many-core hosts. Default to 2 workers; scale explicitly via PM2_INSTANCES.

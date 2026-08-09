@@ -51,7 +51,7 @@
   ·
   <a href="https://play.google.com/store/apps/details?id=com.handscreamgnl.taskview.app"><strong>Android</strong></a>
   ·
-<a href="https://github.com/Gimanh/taskview-community/releases">
+<a href="https://github.com/anikets81/Meridian/releases">
   <strong>Releases</strong>
 </a>
 </p>
@@ -60,8 +60,8 @@
   <a href="./LICENSE">
     <img src="https://img.shields.io/badge/license-Source--Available-blue" alt="Source-Available License">
   </a>
-  <a href="https://github.com/Gimanh/taskview-community/releases">
-    <img src="https://img.shields.io/github/v/release/Gimanh/taskview-community?label=release&color=brightgreen" alt="Latest release">
+  <a href="https://github.com/anikets81/Meridian/releases">
+    <img src="https://img.shields.io/github/v/release/anikets81/Meridian?label=release&color=brightgreen" alt="Latest release">
   </a>
   <a href="https://www.npmjs.com/package/taskview-mcp">
     <img src="https://img.shields.io/npm/v/taskview-mcp?label=taskview-mcp&logo=npm&color=CB3837" alt="taskview-mcp on npm">
@@ -215,7 +215,7 @@ See the [TaskView MCP documentation](https://taskview.tech/docs/integrations/mcp
 Clone the repository:
 
 ```sh
-git clone https://github.com/Gimanh/taskview-community.git
+git clone https://github.com/anikets81/Meridian.git
 cd taskview-community
 ```
 
@@ -344,9 +344,7 @@ docker images
 The following images should be available:
 
 ```text
-gimanhead/taskview-ce-api-server
-gimanhead/taskview-ce-webapp
-gimanhead/taskview-ce-db-migration
+Build and publish your own images from this repository (see `deploy/render-vercel/Dockerfile.api` and `web/build-docker-web.sh`), or use the Docker Compose deploy packages under `deploy/`.
 ```
 
 ### Test the images locally
@@ -447,12 +445,10 @@ When running TaskView in production:
 * [Documentation](https://taskview.tech/docs/)
 * [iOS application](https://apps.apple.com/lk/app/taskview-todo-list-tasks/id6499107867)
 * [Android application](https://play.google.com/store/apps/details?id=com.handscreamgnl.taskview.app)
-* [GitHub repository](https://github.com/Gimanh/taskview-community)
+* [GitHub repository](https://github.com/anikets81/Meridian)
 
 ---
 
-TaskView is developed and maintained by **Nikolai Giman**.
+Meridian is an independent self-hosted project management platform.
 
-TaskView™ and the TaskView logo are trademarks of their respective owner.
-
-Copyright © 2026 Nikolai Giman.
+Copyright © 2026 Meridian.

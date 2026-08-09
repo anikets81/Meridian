@@ -28,17 +28,16 @@
     "graph"
   ],
   "author": {
-    "name": "Nikolai Giman",
-    "email": "gimanhead@gmail.com"
+    "name": "Meridian"
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/Gimanh/taskview-community.git",
+    "url": "git+https://github.com/anikets81/Meridian.git",
     "directory": "taskview-packages/taskview-mcp"
   },
-  "homepage": "https://github.com/Gimanh/taskview-community/tree/main/taskview-packages/taskview-mcp#readme",
+  "homepage": "https://github.com/anikets81/Meridian/tree/main/taskview-packages/taskview-mcp#readme",
   "bugs": {
-    "url": "https://github.com/Gimanh/taskview-community/issues"
+    "url": "https://github.com/anikets81/Meridian/issues"
   },
   "engines": {
     "node": ">=24"

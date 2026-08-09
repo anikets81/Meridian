@@ -110,7 +110,6 @@ async function handleClick() {
             await $api.post('/module/auth/send-login-code', { email: email.value }).catch((err) => console.log(err));
             $ls.setValue('user-email', email.value as string);
         }
-        //gimanhead@gmail.com
         showCodeField.value = true;
     }
 }
