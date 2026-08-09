@@ -5,9 +5,10 @@
   "version": "1.50.4",
   "scripts": {
     "dev": "vite",
-    "build:packages": "pnpm --filter taskview-db-schemas build && pnpm --filter taskview-api build && pnpm --filter capacitor-widget-bridge build",
+    "build:packages": "pnpm --config.engine-strict=false --filter taskview-db-schemas build && pnpm --config.engine-strict=false --filter taskview-api build && pnpm --config.engine-strict=false --filter capacitor-widget-bridge build",
     "generate:config": "node ./scripts/generate-runtime-config.mjs",
     "build": "pnpm run build:packages && pnpm run typecheck && pnpm run generate:config && vite build",
+    "build:vercel": "pnpm --config.engine-strict=false --filter taskview-db-schemas build && pnpm --config.engine-strict=false --filter taskview-api build && pnpm --config.engine-strict=false --filter capacitor-widget-bridge build && node ./scripts/generate-runtime-config.mjs && vite build",
     "build:webapp": "pnpm run build",
     "build-only": "pnpm run generate:config && vite build",
     "preview": "vite preview",
@@ -95,5 +96,8 @@
     "vite": "^7.3.1",
     "vue-tsc": "^3.2.2"
   },
-  "packageManager": "pnpm@10.28.1"
+  "packageManager": "pnpm@10.28.1",
+  "engines": {
+    "node": "24.x"
+  }
 }
